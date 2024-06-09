@@ -25,7 +25,7 @@ use App\Http\Middleware\AdminRoleMiddleware;
 use App\Http\Middleware\Cors;
 use App\Models\Comment;
 
-Route::get('post/getall', [PostController::class, "getAllPosts"]);
+// Route::get('post/getall', [PostController::class, "getAllPosts"]);
 Route::get("post/search", [PostController::class, "searchPostByTitle"]);
 Route::post('post/create', [PostController::class, "createMobilePost"]);
 Route::post("auth/register-mobile", [UserController::class, "createUserMobile"]);
