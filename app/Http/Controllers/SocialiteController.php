@@ -26,7 +26,7 @@ class SocialiteController extends Controller
 
         if ($existedUser) {
             $token = $existedUser->createToken('authToken')->plainTextToken;
-            return redirect()->away('http://localhost:5173/login?token=' . $token);
+            return redirect()->away('https://meraki-frontend-dos2.onrender.com/login?token=' . $token);
         }
 
         $user = User::updateOrCreate(
@@ -49,6 +49,6 @@ class SocialiteController extends Controller
 
         $token = $user->createToken('authToken')->plainTextToken;
 
-        return redirect()->away('http://localhost:5173/login?token=' . $token);
+        return redirect()->away('https://meraki-frontend-dos2.onrender.com/login?token=' . $token);
     }
 }
