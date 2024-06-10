@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
@@ -56,7 +57,7 @@ class CommentController extends Controller
                 $comment->user_pf_img_url = '';
             }
 
-            $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->get();
+            $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->orderBy("created_at", "desc")->get();
 
             $comment->replies = $arrCmt;
 
@@ -263,9 +264,28 @@ class CommentController extends Controller
         //
     }
 
-    public function destroy(Comment $comment)
+    public function destroy($id)
     {
-        //
+        $loggedInUser = Auth::user();
+
+        $comment = Comment::find($id);
+        if (!$comment) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+
+        $post = Post::find($comment->post_id);
+        if (!$post) {
+            return response()->json(['error' => 'Post not found'], 404);
+        }
+
+        if ($loggedInUser->role != 'admin' && $loggedInUser->id != $comment->user_id && $loggedInUser->id != $post->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $comment->comment = "";
+        $comment->save();
+
+        return response()->json(['status' => 200, 'message' => 'Comment deleted successfully'], 200);
     }
 
 

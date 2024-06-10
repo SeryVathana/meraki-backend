@@ -326,7 +326,7 @@ class PostController extends Controller
 
         $result = [];
         for ($i = 0; $i < count($posts); $i++) {
-            $tags = json_decode($posts[$i]->tag);
+            $tags = PostTag::where("post_id", $posts[$i]->id)->get()->pluck("tag_id")->toArray();   
 
             $tagDetails = [];
 
@@ -440,7 +440,8 @@ class PostController extends Controller
                     "description" => $posts[$i]->description,
                     "img_url" => $posts[$i]->img_url,
                     "status" => $posts[$i]->status,
-                    "user_name" => $user->first_name . " " . $user->last_name,
+                    "first_name" => $user->first_name,
+                    "last_name" => $user->last_name,
                     "user_pf_img_url" => $user->pf_img_url,
                     "created_at" => $posts[$i]->created_at,
                     "updated_at" => $posts[$i]->updated_at

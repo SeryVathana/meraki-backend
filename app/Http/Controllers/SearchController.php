@@ -6,6 +6,7 @@ use App\Models\GroupMember;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
@@ -71,7 +72,7 @@ class SearchController extends Controller
 
         for ($i = 0; $i < count($groups); $i++) {
             //get members count
-            $memberCount = GroupMember::where("id", $groups[$i]->id)->count();
+            $memberCount = GroupMember::where("group_id", $groups[$i]->id)->count();
             $groups[$i]->member_count = $memberCount;
         }
 
@@ -121,7 +122,8 @@ class SearchController extends Controller
 
         for ($i = 0; $i < count($groups); $i++) {
             //get members count
-            $memberCount = GroupMember::where("id", $groups[$i]->id)->count();
+            Log::info($groups[$i]->id);
+            $memberCount = GroupMember::where("group_id", $groups[$i]->id)->count();
             $groups[$i]->member_count = $memberCount;
         }
 
@@ -135,7 +137,12 @@ class SearchController extends Controller
 
     public function getRandomPosts()
     {
-        $posts = DB::table('posts')->inRandomOrder()->limit(20)->get();
+        $posts = DB::table('posts')
+            ->join('users', 'posts.user_id', '=', 'users.id')
+            ->select('posts.*', 'users.first_name as first_name', 'users.last_name as last_name', 'users.pf_img_url as user_pf_img_url') // add other user fields if needed
+            ->inRandomOrder()
+            ->limit(20)
+            ->get();
 
         $data = [
             "status" => 200,

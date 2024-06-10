@@ -127,6 +127,7 @@ Route::group([
     Route::get('/comment/{id}', [CommentController::class, 'index']);
     Route::post('/comment', [CommentController::class, 'store']);
     Route::post('/comment/{id}/reply', [CommentController::class, 'reply']);
+    Route::delete("/comment/{id}", [CommentController::class, 'destroy']);
 
     //Saved Post
     Route::post('post/savepost', [SavedPostController::class, 'store']);
