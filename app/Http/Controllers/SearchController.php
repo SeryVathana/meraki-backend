@@ -121,8 +121,6 @@ class SearchController extends Controller
         $groups = DB::table('groups')->inRandomOrder()->limit(10)->get();
 
         for ($i = 0; $i < count($groups); $i++) {
-            //get members count
-            Log::info($groups[$i]->id);
             $memberCount = GroupMember::where("group_id", $groups[$i]->id)->count();
             $groups[$i]->member_count = $memberCount;
         }
