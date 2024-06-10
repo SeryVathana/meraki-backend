@@ -415,9 +415,9 @@ class PostController extends Controller
             return response()->json($data, 404);
         }
 
-        $isGroupMember = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
+        $member = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
 
-        if ($group->status == "private" && $user->role != 'admin' && !$isGroupMember) {
+        if ($group->status == "private" && $user->role != 'admin' && !$member) {
             $authorized = false;
         }
 
@@ -435,6 +435,7 @@ class PostController extends Controller
                     "id" => $posts[$i]->id,
                     "user_id" => $posts[$i]->user_id,
                     "group_id" => $posts[$i]->group_id,
+                    "is_admin" => $member->role == "admin" ? true : false,
                     "tags" => $tags,
                     "title" => $posts[$i]->title,
                     "description" => $posts[$i]->description,

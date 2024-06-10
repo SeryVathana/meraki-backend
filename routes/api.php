@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FolderController;
@@ -25,13 +26,13 @@ use App\Http\Middleware\AdminRoleMiddleware;
 use App\Http\Middleware\Cors;
 use App\Models\Comment;
 
-// Route::get('post/getall', [PostController::class, "getAllPosts"]);
-Route::get("post/search", [PostController::class, "searchPostByTitle"]);
-Route::post('post/create', [PostController::class, "createMobilePost"]);
-Route::post("auth/register-mobile", [UserController::class, "createUserMobile"]);
 
 Route::post('auth/register', [UserController::class, 'createUser']);
 Route::post('auth/login', [UserController::class, 'loginUser']);
+
+Route::post('password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('password/reset', [PasswordResetController::class, 'reset']);
+Route::post('password/checktoken', [PasswordResetController::class, 'checkToken']);
 
 Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
 Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
@@ -39,19 +40,6 @@ Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProvi
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
-
-    Route::get('/send-email', function () {
-        $details = [
-            'first_name' => 'John',
-            'email' => 'znaaamz@gmail.com',
-            'password' => 'generated_password123'
-        ];
-
-        Mail::to($details['email'])->send(new SendMail($details));
-
-        return 'Admin notification email sent!';
-    });
-
     Route::get("user", [UserController::class, "getUserData"]);
     Route::put('auth/logout', [UserController::class, 'logout']);
     Route::get('auth/logoutAll', [UserController::class, 'logoutAll']);

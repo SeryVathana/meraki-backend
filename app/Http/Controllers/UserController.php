@@ -100,12 +100,6 @@ class UserController extends Controller
                 $pfImgUrl = $request->pf_img_url;
             }
 
-            if (!$request->social_login_info) {
-                $socialLoginInfo = "{}";
-            } else {
-                $socialLoginInfo = $request->social_login_info;
-            }
-
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,

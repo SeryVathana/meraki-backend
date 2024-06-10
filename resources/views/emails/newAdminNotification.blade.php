@@ -114,7 +114,7 @@
             </p>
             <p>Best regards,</p>
             <p>The Meraki Team</p>
-            <a href="http://yourappurl.com/login" class="button"
+            <a href="https://meraki-frontend-dos2.onrender.com/login" class="button"
                 style="display: inline-block; padding: 12px 25px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; text-align: center; margin-top: 20px; transition: background-color 0.3s ease;">Login
                 to App</a>
         </div>
