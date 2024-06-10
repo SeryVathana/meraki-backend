@@ -57,7 +57,7 @@ class CommentController extends Controller
                 $comment->user_pf_img_url = '';
             }
 
-            $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->orderBy("created_at", "desc")->get();
+            $arrCmt = Comment::where('reply_cmt_id', "=", $comment->id)->orderBy("created_at", "asc")->get();
 
             $comment->replies = $arrCmt;
 
