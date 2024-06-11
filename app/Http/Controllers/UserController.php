@@ -624,6 +624,15 @@ class UserController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Clear Socialite session
+        $request->session()->forget('state'); // Google OAuth state key
+        $request->session()->forget('code'); // OAuth authorization code
+        $request->session()->forget('oauth_token'); // OAuth token if present
+
         return response()->json([
             'status' => 200,
             'message' => 'User Logged Out Successfully'
@@ -636,6 +645,38 @@ class UserController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'User Logged Out From All Devices Successfully'
+        ], 200);
+    }
+
+    public function checkUserPassword(Request $request)
+    {
+        $loggedUser = Auth::user();
+
+        $validateUser = Validator::make(
+            $request->all(),
+            [
+                'password' => 'required',
+            ]
+        );
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        if (!Hash::check($request->password, $loggedUser->password)) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Incorrect Password',
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Password Matched',
         ], 200);
     }
 
