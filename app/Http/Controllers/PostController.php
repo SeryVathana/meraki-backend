@@ -893,7 +893,7 @@ class PostController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'title' => 'required',
+            'title' => 'nullable',
             'description' => 'nullable|max:255',
             'img_url' => 'required',
             'status' => 'required',

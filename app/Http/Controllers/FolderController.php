@@ -324,7 +324,7 @@ class FolderController extends Controller
         $userId = $user->id;
 
         $validator = Validator::make($request->all(), [
-            'title' => 'nullable',
+            'title' => 'required',
             'description' => 'nullable|max:255',
             'status' => 'required',
         ]);
