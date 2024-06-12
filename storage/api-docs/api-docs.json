@@ -184,6 +184,55 @@
                 }
             }
         },
+        "/api/comment/{id}": {
+            "delete": {
+                "tags": [
+                    "UserComment"
+                ],
+                "summary": "Delete Comment ",
+                "description": "Deletes a specific Comment ",
+                "operationId": "UserdeleteComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "GroupInvite deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    }
+                }
+            }
+        },
         "/api/admin/comment": {
             "get": {
                 "tags": [
@@ -216,7 +265,7 @@
         "/api/admin/comment/{id}": {
             "get": {
                 "tags": [
-                    "AdminCommnet"
+                    "AdminComment"
                 ],
                 "summary": "Get Commnet information",
                 "description": "Returns Commnet data",
@@ -299,6 +348,496 @@
                 }
             }
         },
+        "/api/admin/getTotalUsers": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get total users",
+                "description": "Returns the total number of users and the percentage of new users in the last week.",
+                "operationId": "AdmingetTotalUsers",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Total users fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_users": {
+                                                    "type": "integer",
+                                                    "example": 1000
+                                                },
+                                                "last_week_percent": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/getTotalPosts": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get total posts",
+                "description": "Returns the total number of posts and the percentage of new posts in the last week.",
+                "operationId": "AdmingetTotalPosts",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Total posts fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_posts": {
+                                                    "type": "integer",
+                                                    "example": 1000
+                                                },
+                                                "last_week_percent": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/getTotalGroups": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get total groups",
+                "description": "Returns the total number of groups and the percentage of new groups in the last week.",
+                "operationId": "AdmingetTotalGroups",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Total groups fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_groups": {
+                                                    "type": "integer",
+                                                    "example": 1000
+                                                },
+                                                "last_week_percent": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/getWeeklyNewUsers": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get weekly new users",
+                "description": "Returns the number of new users for the last week and the difference compared to the previous week.",
+                "operationId": "AdmingetWeeklyNewUsers",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Weekly new users fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "weekly_new_users": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "difference": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/get10NewUsers": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get 10 newest users",
+                "description": "Returns the 10 newest users.",
+                "operationId": "Adminget10NewUsers",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "10 newest users fetched successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string",
+                                                        "example": "Doe"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "john.doe@example.com"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/profile.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/getTotalPostsOfLastSixMonths": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get total posts of the last six months",
+                "description": "Returns the total number of posts for each of the last six months.",
+                "operationId": "AdmingetTotalPostsOfLastSixMonths",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Total posts of last six months fetched successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer",
+                                                "example": 100
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get all users",
+                "description": "Returns a list of all users with their posts, groups owned, and groups joined.",
+                "operationId": "AdmingetAllUsers",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Users Retrieved Successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string",
+                                                        "example": "Doe"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "john.doe@example.com"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/profile.jpg"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "posts": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "group_own": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "group_member": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/admin/admins": {
+            "get": {
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "summary": "Get all admins",
+                "description": "Returns a list of all admins.",
+                "operationId": "AdmingetAllAdmins",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admins Retrieved Successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string",
+                                                        "example": "Doe"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "john.doe@example.com"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/profile.jpg"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
         "/api/folder": {
             "get": {
                 "tags": [
@@ -313,8 +852,49 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {}
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "folders": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "saved_posts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "img_url": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -331,9 +911,80 @@
                 "tags": [
                     "UserFolder"
                 ],
-                "summary": "Create Folder ",
-                "description": "Creates a Folder ",
+                "summary": "Create Folder",
+                "description": "Creates a Folder",
                 "operationId": "storeFolder",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "private"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Folder created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Folder created successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/folder/post/{id}": {
+            "get": {
+                "tags": [
+                    "UserFolder"
+                ],
+                "summary": "Get folders by post ID",
+                "description": "Returns folders containing a specific post",
+                "operationId": "getFoldersByPostId",
                 "parameters": [
                     {
                         "name": "id",
@@ -344,71 +995,137 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "description",
-                                    "title",
-                                    "status",
-                                    "user_id"
-                                ],
-                                "properties": {
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "title": {
-                                        "type": "string"
-                                    },
-                                    "status": {
-                                        "type": "string"
-                                    },
-                                    "user_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
-                    "201": {
-                        "description": "Request created successfully",
+                    "200": {
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "User already in group or already requested",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "folders": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_saved": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
                     "404": {
-                        "description": "Group not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Post not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 }
             }
         },
         "/api/folder/{id}": {
+            "get": {
+                "tags": [
+                    "UserFolder"
+                ],
+                "summary": "Get Folder by ID",
+                "description": "Returns a Folder by ID",
+                "operationId": "getFolderById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "folder": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Folder not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "UserFolder"
                 ],
-                "summary": "Update Folder ",
-                "description": "Updates a specific Folder ",
+                "summary": "Update Folder",
+                "description": "Updates a specific Folder",
                 "operationId": "updateFolder",
                 "parameters": [
                     {
@@ -426,19 +1143,23 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "description",
                                     "title",
                                     "status"
                                 ],
                                 "properties": {
-                                    "description": {
-                                        "type": "string"
-                                    },
                                     "title": {
                                         "type": "string"
                                     },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
                                     "status": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "private"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -448,21 +1169,36 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Member updated successfully",
+                        "description": "Folder updated successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Folder updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad request"
-                    },
-                    "403": {
-                        "description": "Unauthorized"
+                        "description": "Invalid input"
                     },
                     "404": {
-                        "description": "Group not found"
+                        "description": "Folder not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 }
             },
@@ -470,8 +1206,8 @@
                 "tags": [
                     "UserFolder"
                 ],
-                "summary": "Delete Folder ",
-                "description": "Deletes a specific Folder ",
+                "summary": "Delete Folder",
+                "description": "Deletes a specific Folder",
                 "operationId": "deleteFolder",
                 "parameters": [
                     {
@@ -483,41 +1219,35 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_id"
-                                ],
-                                "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
-                        "description": "GroupInvite deleted successfully",
+                        "description": "Folder deleted successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Folder deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad request"
+                    "404": {
+                        "description": "Folder not found"
                     },
-                    "403": {
+                    "401": {
                         "description": "Unauthorized"
                     },
-                    "404": {
-                        "description": "Group not found"
+                    "403": {
+                        "description": "Forbidden"
                     }
                 }
             }
@@ -529,7 +1259,7 @@
                 ],
                 "summary": "Get list of Groups",
                 "description": "Returns list of Groups",
-                "operationId": "getGroupList",
+                "operationId": "UsergetGroupList",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -629,6 +1359,77 @@
                 }
             }
         },
+        "/api/group/mygroups": {
+            "get": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Get my groups",
+                "description": "Returns a list of groups",
+                "operationId": "UsergetMyGroups",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/group/user/{id}": {
+            "get": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Get groups by user ID",
+                "description": "Returns a list of groups owned by a specific user",
+                "operationId": "UsergetUserGroups",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
         "/api/group/{id}": {
             "get": {
                 "tags": [
@@ -699,6 +1500,11 @@
                                     },
                                     "title": {
                                         "type": "string"
+                                    },
+                                    "img_url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -730,9 +1536,9 @@
                 "tags": [
                     "UserGroup"
                 ],
-                "summary": "Delete group ",
-                "description": "Deletes a specific group ",
-                "operationId": "deleteGroup",
+                "summary": "Delete group",
+                "description": "Deletes a specific group",
+                "operationId": "UserdeleteGroup",
                 "parameters": [
                     {
                         "name": "id",
@@ -743,30 +1549,22 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_id"
-                                ],
-                                "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
-                        "description": "GroupInvite deleted successfully",
+                        "description": "Group deleted successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
@@ -778,6 +1576,183 @@
                     },
                     "404": {
                         "description": "Group not found"
+                    }
+                }
+            }
+        },
+        "/api/group/promote/{id}": {
+            "put": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Promote member to admin",
+                "description": "Promotes a member to admin role",
+                "operationId": "UserpromoteToAdmin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member promoted to admin successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/group/demote/{id}": {
+            "put": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Demote admin to member",
+                "description": "Demotes an admin to member role",
+                "operationId": "UserdemoteAdmin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member demoted to user successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/group/public/join/{id}": {
+            "put": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Join a public group",
+                "description": "Allows a user to join a public group",
+                "operationId": "UserjoinPublicGroup",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You have joined the group successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    },
+                    "400": {
+                        "description": "You are already a member of this group"
+                    }
+                }
+            }
+        },
+        "/api/group/leave/{id}": {
+            "put": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Leave a group",
+                "description": "Allows a user to leave a group",
+                "operationId": "UserleaveGroup",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You have left the group successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    },
+                    "400": {
+                        "description": "You are not a member of this group"
                     }
                 }
             }
@@ -942,6 +1917,72 @@
                 }
             }
         },
+        "/api/group/pending/invite": {
+            "get": {
+                "tags": [
+                    "UserGroupInvite"
+                ],
+                "summary": "Get Pending Group Invites",
+                "description": "Returns a list of pending group invites for the authenticated user.",
+                "operationId": "44df8c4dd9f6e5e8aae8f6fa09cc884e",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "invites": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "group_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "img_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/group/invite/accept/{id}": {
             "put": {
                 "tags": [
@@ -1005,6 +2046,94 @@
                         "description": "Group not found"
                     }
                 }
+            }
+        },
+        "/api/group/notmember/{id}": {
+            "get": {
+                "tags": [
+                    "UserGroupMember"
+                ],
+                "summary": "Get users who are not members of the group",
+                "description": "Retrieves users who are not members of the specified group and match the search query.",
+                "operationId": "c0221a938b9cdd4df1a102e2e1733de5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the group",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query to filter users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_following": {
+                                                        "description": "Indicates if the authenticated user is following this user",
+                                                        "type": "boolean"
+                                                    },
+                                                    "is_invited": {
+                                                        "description": "Indicates if the user is invited to the group",
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/group/member/{id}": {
@@ -1280,10 +2409,42 @@
                 }
             }
         },
+        "/api/group/request/pending/{id}": {
+            "get": {
+                "tags": [
+                    "UserGroupRequest"
+                ],
+                "summary": "Retrieve pending requests for a group",
+                "description": "Retrieves pending requests for a group identified by its ID.",
+                "operationId": "getPendingRequests",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Group ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    }
+                }
+            }
+        },
         "/api/group/request/accept/{id}": {
             "put": {
                 "tags": [
-                    "GroupRequest"
+                    "UserGroupRequest"
                 ],
                 "summary": "Update Group Request",
                 "description": "Updates a specific Group Request",
@@ -1445,6 +2606,20 @@
                 }
             }
         },
+        "/api/post/allpostslist": {
+            "get": {
+                "tags": [
+                    "UserPost"
+                ],
+                "summary": "Get all public allpostslist",
+                "operationId": "getAllPostsList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
         "/api/post/highlighted": {
             "get": {
                 "tags": [
@@ -1504,6 +2679,24 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/post/mypost/mobile": {
+            "get": {
+                "tags": [
+                    "UserPost"
+                ],
+                "summary": "Retrieve posts created by the authenticated user",
+                "description": "Returns posts along with user details as JSON.",
+                "operationId": "getMyPostsMobile",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             }
@@ -1582,6 +2775,58 @@
                     },
                     "404": {
                         "description": "Group not found"
+                    }
+                }
+            }
+        },
+        "/api/post/createmobilepost": {
+            "post": {
+                "tags": [
+                    "UserPost"
+                ],
+                "summary": "Create a new post",
+                "description": "Creates a new post with the provided details.",
+                "operationId": "createMobilePost",
+                "requestBody": {
+                    "description": "Post details",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "title",
+                                    "description",
+                                    "img_url"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "img_url": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Post created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "403": {
+                        "description": "Forbiden"
                     }
                 }
             }
@@ -1869,6 +3114,70 @@
                 }
             }
         },
+        "api/post/like/{id}": {
+            "post": {
+                "tags": [
+                    "UserPostLikes"
+                ],
+                "summary": "Like a post",
+                "description": "Insert the Like to Post",
+                "operationId": "getAllPostLikes",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the post to like",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully liked the post"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "api/post/unlike/{id}": {
+            "delete": {
+                "tags": [
+                    "UserPostLikes"
+                ],
+                "summary": "Unlike a post",
+                "description": "delete the Like to Post",
+                "operationId": "deleteAllPostLikes",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the post to unlike",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully unliked the post"
+                    },
+                    "401": {
+                        "description": "Unauthorized to unlike the post"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
         "/api/report": {
             "get": {
                 "tags": [
@@ -2012,6 +3321,230 @@
                     },
                     "404": {
                         "description": "Report not found"
+                    }
+                }
+            }
+        },
+        "/api/post/savedposts/{id}": {
+            "get": {
+                "tags": [
+                    "UserSavedPost"
+                ],
+                "summary": "Get saved posts in a folder",
+                "description": "Return the SavePost",
+                "operationId": "getAllSavePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the folder",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved saved posts"
+                    },
+                    "400": {
+                        "description": "Folder not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/post/savepost": {
+            "post": {
+                "tags": [
+                    "UserSavedPost"
+                ],
+                "summary": "Save a post to one or more folders",
+                "description": "Insert the SavePost",
+                "operationId": "InsertSavePost",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Post saved successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request or post not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/post/advancesearch": {
+            "get": {
+                "tags": [
+                    "UserSearch"
+                ],
+                "summary": "Perform advanced search",
+                "operationId": "a4d0b3a03739607d6d2af6dd35ab7a37",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "hi"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search/user": {
+            "get": {
+                "tags": [
+                    "UserSearch"
+                ],
+                "summary": "SearchUsers",
+                "description": "Insert to SearchUsers",
+                "operationId": "SearchUsers",
+                "parameters": [
+                    {
+                        "name": "term",
+                        "in": "query",
+                        "description": "Search term",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search/group": {
+            "get": {
+                "tags": [
+                    "UserSearch"
+                ],
+                "summary": "SearchGroups",
+                "description": "Insert the SearchGroups",
+                "operationId": "SearchGroups",
+                "parameters": [
+                    {
+                        "name": "term",
+                        "in": "query",
+                        "description": "Search term",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search/post": {
+            "get": {
+                "tags": [
+                    "UserSearch"
+                ],
+                "summary": "SearchPosts",
+                "description": "Insert to SearchPost",
+                "operationId": "SearchPost",
+                "parameters": [
+                    {
+                        "name": "term",
+                        "in": "query",
+                        "description": "Search term",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "posts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -2284,6 +3817,188 @@
                 }
             }
         },
+        "/api/admin/createAdmin": {
+            "post": {
+                "tags": [
+                    "AdminUser"
+                ],
+                "summary": "Create admin",
+                "description": "Create a new admin user.",
+                "operationId": "5a022010cbe3100df648f0155ebbdca6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "pf_img_url": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Admin created successfully"
+                    },
+                    "400": {
+                        "description": "Admin already exists"
+                    },
+                    "401": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/auth/createusermobile": {
+            "post": {
+                "tags": [
+                    "CreateUserMobile"
+                ],
+                "summary": "Create a new user via mobile",
+                "description": "Creates a new user with email and password.",
+                "operationId": "77faa0997fc4971b0d8532d2f8ddf9a6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "pf_img_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.jpg"
+                                    },
+                                    "social_login_info": {
+                                        "type": "string",
+                                        "example": "{}"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User Created Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Created Successfully"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "someTokenValue"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "validation error"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email already taken",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email already taken"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/login": {
             "post": {
                 "tags": [
@@ -2333,33 +4048,804 @@
                 }
             }
         },
-        "/api/auth/users": {
+        "/api/user": {
             "get": {
                 "tags": [
-                    "User"
+                    "UserUser"
                 ],
-                "summary": "Get All Users",
-                "description": "Retrieve all users. Only accessible to admin users.",
-                "operationId": "getAllUsers",
+                "summary": "Get user data",
+                "description": "Get user data.",
+                "operationId": "f1c79f18180e7803b471a4352c560bc8",
                 "responses": {
                     "200": {
-                        "description": "Users Retrieved Successfully",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {}
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "last_name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "pf_img_url": {
+                                                    "type": "string"
+                                                },
+                                                "followers": {
+                                                    "type": "integer"
+                                                },
+                                                "followings": {
+                                                    "type": "integer"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "invites": {
+                                                    "type": "integer"
+                                                },
+                                                "group_req": {
+                                                    "type": "integer"
+                                                },
+                                                "total_noti": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/mobile": {
+            "get": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Get user data for mobile",
+                "description": "Get user data for mobile.",
+                "operationId": "b9ea3aafe455fd94614c2fb7f9ad6d02",
+                "responses": {
+                    "200": {
+                        "description": "User data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{id}": {
+            "get": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Get user data by ID",
+                "description": "Get user data by ID.",
+                "operationId": "212d9bd97d45230f70786a06fb3ce67d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "last_name": {
+                                                    "type": "string"
+                                                },
+                                                "is_following": {
+                                                    "type": "boolean"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "pf_img_url": {
+                                                    "type": "string"
+                                                },
+                                                "followers": {
+                                                    "type": "integer"
+                                                },
+                                                "followings": {
+                                                    "type": "integer"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/editMobile": {
+            "put": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Edit user editMobile",
+                "description": "Edit user editMobile.",
+                "operationId": "8975a0a79453d78974b4291b326e0895",
+                "requestBody": {
+                    "description": "User editMobile data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully"
+                    },
+                    "401": {
+                        "description": "Validation error or no changes made"
+                    }
+                }
+            }
+        },
+        "/api/user/edit": {
+            "put": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Edit user profile",
+                "description": "Edit user profile.",
+                "operationId": "c94718d69913d21fdd3c5c66ffee684d",
+                "requestBody": {
+                    "description": "User profile data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully"
+                    },
+                    "401": {
+                        "description": "Validation error or no changes made"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "put": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Logout user",
+                "description": "Logout user.",
+                "operationId": "454106768c02fc0451f111a6912224ff",
+                "responses": {
+                    "200": {
+                        "description": "User logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/logoutAll": {
+            "get": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Logout user from all devices",
+                "description": "Logout user from all devices.",
+                "operationId": "27fd4c26f4c3554dc4df760ce5a69d66",
+                "responses": {
+                    "200": {
+                        "description": "User logged out from all devices successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/user/password": {
+            "put": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Update user password",
+                "description": "Update user password.",
+                "operationId": "3788eb3a88cc86b985d2b7c4ed9ec355",
+                "requestBody": {
+                    "description": "User password data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "old_password",
+                                    "new_password"
+                                ],
+                                "properties": {
+                                    "old_password": {
+                                        "type": "string"
+                                    },
+                                    "new_password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password updated successfully"
+                    },
+                    "401": {
+                        "description": "Validation error or incorrect old password or new password same as old password"
+                    }
+                }
+            }
+        },
+        "/api/user/updatepf": {
+            "put": {
+                "tags": [
+                    "UserUser"
+                ],
+                "summary": "Update user profile image",
+                "description": "Update user profile image.",
+                "operationId": "ccd16747c148b6a54f8fdfe001579e47",
+                "requestBody": {
+                    "description": "User profile image data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "pf_img_url"
+                                ],
+                                "properties": {
+                                    "pf_img_url": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile image updated successfully"
+                    },
+                    "401": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/admin/user/{id}": {
+            "put": {
+                "tags": [
+                    "AdminUser"
+                ],
+                "summary": "Update user information by admin",
+                "description": "Update user information by admin using user ID.",
+                "operationId": "d1d17efdd64f1a265cc94f6aeedec703",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User data to update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "pf_img_url"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "pf_img_url": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden: You do not have permission to access this resource."
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/admin/remove{id}": {
+            "put": {
+                "tags": [
+                    "AdminUser"
+                ],
+                "summary": "Remove admin role from a user",
+                "description": "Remove admin role from a user by ID.",
+                "operationId": "5355203c6706041b1bc0e904439b96e3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Admin role removed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "403": {
-                        "description": "Forbidden",
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/admin/deleteUser/{id}": {
+            "delete": {
+                "tags": [
+                    "AdminUser"
+                ],
+                "summary": "Delete a user",
+                "description": "Delete a user by ID.",
+                "operationId": "a3ae242aad7c833abe8f520a7d9113bd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/follow/{id}": {
+            "put": {
+                "tags": [
+                    "UserFollower"
+                ],
+                "summary": "Follow a user",
+                "description": "Follow a user by ID.",
+                "operationId": "followUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to follow",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User followed successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/unfollow/{id}": {
+            "put": {
+                "tags": [
+                    "UserFollower"
+                ],
+                "summary": "Unfollow a user",
+                "description": "Unfollow a user by ID.",
+                "operationId": "unfollowUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to unfollow",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User unfollowed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/follower/{id}": {
+            "get": {
+                "tags": [
+                    "UserFollower"
+                ],
+                "summary": "Get user followers",
+                "description": "Get user followers by ID.",
+                "operationId": "195afe66bae1db1fb5462f8d6081b54f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User followers"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_following": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/following/{id}": {
+            "get": {
+                "tags": [
+                    "UserFollower"
+                ],
+                "summary": "getUserFollowing",
+                "description": "getUserFollowing by ID.",
+                "operationId": "4604572a0ecd8953561273fdd4d9be55",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Followers"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "pf_img_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_following": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
                     }
                 }
             }
