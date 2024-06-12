@@ -41,8 +41,9 @@ Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
     Route::get("user", [UserController::class, "getUserData"]);
-    Route::put('auth/logout', [UserController::class, 'logout']);
+    Route::get('auth/logout', [UserController::class, 'logout']);
     Route::get('auth/logoutAll', [UserController::class, 'logoutAll']);
+    Route::post('auth/checkpassword', [UserController::class, 'checkUserPassword']);
     Route::put('user/password', [UserController::class, 'updateUserPassword']);
     Route::get('user/mobile', [UserController::class, 'getUserDataMobile']);
     Route::put('user/edit', [UserController::class, 'editProfile']);
@@ -77,6 +78,7 @@ Route::group([
     Route::post('group', [GroupController::class, "store"]);
     Route::put('group/{id}', [GroupController::class, "update"]);
     Route::delete('group/{id}', [GroupController::class, "destroy"]);
+    Route::post('group/transfer/{id}', [GroupController::class, "transferGroupOwnership"]);
 
     // Group member
     Route::put("group/public/join/{id}", [GroupController::class, "joinPublicGroup"]); // $id = group id
@@ -93,7 +95,8 @@ Route::group([
     // Group invite
     Route::get('group/invite/{id}', [GroupInviteController::class, "index"]); //$id = group id
     Route::post('group/invite/{id}', [GroupInviteController::class, "store"]); //$id = group id
-    Route::delete('group/invite/{id}', [GroupInviteController::class, "destroy"]); //$id = invite id
+    Route::delete('group/invite/{group_id}/{user_id}', [GroupInviteController::class, "destroy"]); //$id = invite id
+    Route::delete('group/invite/{id}', [GroupInviteController::class, "destroy2"]); //$id = invite id
     Route::put('group/invite/accept/{id}', [GroupInviteController::class, "update"]); //$id = invite id
     Route::get("group/pending/invite", [GroupInviteController::class, "getPendingInvites"]);
     //Group request

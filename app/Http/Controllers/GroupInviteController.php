@@ -427,7 +427,59 @@ public function getPendingInvites()
      * )
      */
 
-    public function destroy(UpdateGroupInviteRequest $request, $id)
+    public function destroy($group_id, $user_id)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $invite = GroupInvite::where('user_id', $user_id)->where('group_id', $group_id)->first();
+
+        if (!$invite) {
+            $data = [
+                "status" => 404,
+                "message" => "Invite not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $group = Group::find($invite->group_id);
+
+        $authorized = false;
+
+        if ($userId == $group->owner_id) {
+            $authorized = true;
+        }
+
+        if (GroupMember::where('group_id', $invite->group_id)->where('user_id', $userId)->where('role', "admin")->exists()) {
+            $authorized = true;
+        }
+
+        if ($userId == $invite->user_id) {
+            $authorized = true;
+        }
+
+        if ($authorized == true) {
+            $invite->delete();
+
+            $data = [
+                "status" => 200,
+                "message" => "Invite removed successfully"
+            ];
+
+            return response()->json($data, 200);
+
+        } else {
+            $data = [
+                "status" => 403,
+                "message" => "Unauthorized"
+            ];
+
+            return response()->json($data, 403);
+        }
+    }
+
+    public function destroy2($id)
     {
         $user = Auth::user();
         $userId = $user->id;

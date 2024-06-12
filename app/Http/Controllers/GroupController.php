@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendTransferMail;
 use App\Models\Group;
 use App\Models\GroupInvite;
 use App\Models\GroupMember;
@@ -13,6 +14,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class GroupController extends Controller
@@ -937,6 +940,112 @@ public function destroy($id)
         $data = [
             "status" => 200,
             "message" => "You have left the group successfully"
+        ];
+
+        return response()->json($data, 200);
+    }
+
+    public function transferGroupOwnership(Request $request, $id)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+
+        $group = Group::find($id);
+
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $owner = Group::where("id", $id)->where("owner_id", $userId)->first();
+
+        if (!$owner) {
+            $data = [
+                "status" => 400,
+                "message" => "You are not the owner of this group"
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        $validator = Validator::make(request()->all(), [
+            'new_owner_id' => 'required|integer',
+            'password' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $data = [
+                "status" => 400,
+                "message" => $validator->messages()
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        //check password
+        if (!Hash::check(request()->password, $user->password)) {
+            $data = [
+                "status" => 401,
+                "message" => "Password is incorrect"
+            ];
+
+            return response()->json($data, 401);
+        }
+
+        $newOwnerId = request()->new_owner_id;
+
+        $newOwner = User::find($newOwnerId);
+
+        if (!$newOwner) {
+            $data = [
+                "status" => 404,
+                "message" => "New owner not found"
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $group->owner_id = $newOwnerId;
+        $group->save();
+
+        $member = GroupMember::where("group_id", $id)->where("user_id", $newOwnerId)->first();
+
+        if (!$member) {
+            $member = new GroupMember;
+
+            $member->group_id = $id;
+            $member->user_id = $newOwnerId;
+            $member->role = "admin";
+
+            $member->save();
+        } else {
+            $member->role = "admin";
+            $member->save();
+        }
+
+
+        // send mail
+
+        $details = [
+            'group_id' => $group->id,
+            'group_name' => $group->title,
+            "toEmail" => $newOwner->email,
+            "fromEmail" => $user->email,
+            "first_name" => $newOwner->first_name,
+        ];
+
+        Mail::to($details['toEmail'])->send(new SendTransferMail($details));
+
+
+
+        $data = [
+            "status" => 200,
+            "message" => "Group ownership transferred successfully"
         ];
 
         return response()->json($data, 200);
