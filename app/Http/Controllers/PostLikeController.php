@@ -9,6 +9,36 @@ use Illuminate\Support\Facades\Auth;
 
 class PostLikeController extends Controller
 {
+     /**
+     * @OA\Post(
+     *     path="api/post/like/{id}",
+     *     tags={"UserPostLikes"},
+     *     summary="Like a post",
+     *     operationId="getAllPostLikes",
+     *     description="Insert the Like to Post",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the post to like",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully liked the post"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     )
+     * )
+     */
     public function likePost($id)
     {
         $user = Auth::user();
@@ -53,6 +83,36 @@ class PostLikeController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="api/post/unlike/{id}",
+     *     summary="Unlike a post",
+     *     tags={"UserPostLikes"},
+     *     operationId="deleteAllPostLikes",
+     *     description="delete the Like to Post",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the post to unlike",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully unliked the post"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized to unlike the post"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     )
+     * )
+     */
     public function unlikePost($id)
     {
         $user = Auth::user();

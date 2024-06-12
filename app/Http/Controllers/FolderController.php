@@ -14,9 +14,7 @@ class FolderController extends Controller
 {
     /**
      * Display a listing of the resource.
-     */
-
-    /**
+     *
      * @OA\Get(
      *     path="/api/folder",
      *     operationId="getFolder",
@@ -27,8 +25,28 @@ class FolderController extends Controller
      *         response=200,
      *         description="Successful operation",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items()
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="integer",
+     *                 example=200
+     *             ),
+     *             @OA\Property(
+     *                 property="folders",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="title", type="string"),
+     *                     @OA\Property(property="saved_posts", type="array", @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="img_url", type="string"),
+     *                     )),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
      *         ),
      *     ),
      *     @OA\Response(
@@ -49,33 +67,29 @@ class FolderController extends Controller
         $folders = Folder::where("user_id", $userId)->get();
 
         $data = [];
-        for ($i = 0; $i < count($folders); $i++) {
-            $savedPosts = SavedPost::where("user_id", $userId)->where("folder_id", $folders[$i]->id)->limit(3)->get();
+        foreach ($folders as $folder) {
+            $savedPosts = SavedPost::where("user_id", $userId)->where("folder_id", $folder->id)->limit(3)->get();
 
             $allSavedPosts = [];
-            for ($j = 0; $j < count($savedPosts); $j++) {
-
-                $post = Post::where("id", $savedPosts[$j]->post_id)->first();
+            foreach ($savedPosts as $savedPost) {
+                $post = Post::find($savedPost->post_id);
                 if (!$post) {
                     continue;
                 }
 
-                $savePost = [
+                $allSavedPosts[] = [
                     "id" => $post->id,
                     "img_url" => $post->img_url,
                 ];
-
-                array_push($allSavedPosts, $savePost);
             }
-            $folder = [
-                "id" => $folders[$i]->id,
-                "title" => $folders[$i]->title,
-                "saved_posts" => $allSavedPosts,
-                "created_at" => $folders[$i]->created_at,
-                "updated_at" => $folders[$i]->updated_at
-            ];
 
-            array_push($data, $folder);
+            $data[] = [
+                "id" => $folder->id,
+                "title" => $folder->title,
+                "saved_posts" => $allSavedPosts,
+                "created_at" => $folder->created_at,
+                "updated_at" => $folder->updated_at,
+            ];
         }
 
         $result = [
@@ -85,112 +99,130 @@ class FolderController extends Controller
 
         return response()->json($result, 200);
     }
+
+    /**
+     * Get folders by post ID.
+     *
+     * @OA\Get(
+     *     path="/api/folder/post/{id}",
+     *     operationId="getFoldersByPostId",
+     *     tags={"UserFolder"},
+     *     summary="Get folders by post ID",
+     *     description="Returns folders containing a specific post",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="integer",
+     *                 example=200
+     *             ),
+     *             @OA\Property(
+     *                 property="folders",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="title", type="string"),
+     *                     @OA\Property(property="is_saved", type="boolean"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function getFoldersByPostId($id)
     {
         $user = Auth::user();
         $userId = $user->id;
 
-        $post = Post::where("id", $id)->first();
+        $post = Post::find($id);
         if (!$post) {
-            $data = [
-                "status" => 404,
-                "message" => "Post not found"
-            ];
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Post not found"], 404);
         }
 
         $folders = Folder::where("user_id", $userId)->get();
 
         $data = [];
-        for ($i = 0; $i < count($folders); $i++) {
+        foreach ($folders as $folder) {
+            $isSaved = SavedPost::where("user_id", $userId)->where("folder_id", $folder->id)->where("post_id", $id)->exists();
 
-
-            $isSaved = false;
-
-            $savedPost = SavedPost::where("user_id", $userId)->where("folder_id", $folders[$i]->id)->where("post_id", $id)->first();
-            if (!$savedPost) {
-                $isSaved = false;
-            } else {
-                $isSaved = true;
-            }
-
-            $folder = [
-                "id" => $folders[$i]->id,
-                "title" => $folders[$i]->title,
+            $data[] = [
+                "id" => $folder->id,
+                "title" => $folder->title,
                 "is_saved" => $isSaved,
-                "created_at" => $folders[$i]->created_at,
-                "updated_at" => $folders[$i]->updated_at
+                "created_at" => $folder->created_at,
+                "updated_at" => $folder->updated_at,
             ];
-
-            array_push($data, $folder);
         }
 
-        $result = [
-            "status" => 200,
-            "folders" => $data,
-        ];
-
-        return response()->json($result, 200);
-    }
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(["status" => 200, "folders" => $data], 200);
     }
 
     /**
      * Store a newly created resource in storage.
-     */
-
-    /**
+     *
      * @OA\Post(
      *     path="/api/folder",
      *     operationId="storeFolder",
      *     tags={"UserFolder"},
-     *     summary="Create Folder ",
-     *     description="Creates a Folder ",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(
-     *             type="integer"
-     *         )
-     *     ),
+     *     summary="Create Folder",
+     *     description="Creates a Folder",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"description", "title", "status", "user_id"},
-     *             @OA\Property(property="description", type="string"),
+     *             required={"title", "status"},
      *             @OA\Property(property="title", type="string"),
-     *             @OA\Property(property="status", type="string"),
-     *             @OA\Property(property="user_id", type="integer")
+     *             @OA\Property(property="description", type="string", nullable=true),
+     *             @OA\Property(property="status", type="string", enum={"public", "private"})
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="Request created successfully",
-     *         @OA\JsonContent()
+     *         response=200,
+     *         description="Folder created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Folder created successfully")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="User already in group or already requested",
-     *         @OA\JsonContent()
+     *         description="Invalid input",
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Group not found",
-     *         @OA\JsonContent()
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
      *     )
      * )
      */
-
     public function store(StoreFolderRequest $request)
     {
         $user = Auth::user();
@@ -199,27 +231,11 @@ class FolderController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'description' => 'nullable|max:255',
-            'status' => 'required',
+            'status' => 'required|in:public,private',
         ]);
 
         if ($validator->fails()) {
-
-            $data = [
-                "status" => 400,
-                "message" => $validator->messages()
-            ];
-
-            return response()->json($data, 400);
-
-        }
-
-        if ($request->status != "public" && $request->status != "private") {
-            $data = [
-                "status" => 400,
-                "message" => "Invalid input"
-            ];
-
-            return response()->json($data, 400);
+            return response()->json(["status" => 400, "message" => $validator->messages()], 400);
         }
 
         $folder = new Folder;
@@ -229,92 +245,117 @@ class FolderController extends Controller
         $folder->status = $request->status;
         $folder->save();
 
-        $data = [
-            "status" => 200,
-            "message" => "Folder created successfully",
-        ];
-
-        return response()->json($data, 200);
+        return response()->json(["status" => 200, "message" => "Folder created successfully"], 200);
     }
 
     /**
      * Display the specified resource.
+     *
+     * @OA\Get(
+     *     path="/api/folder/{id}",
+     *     operationId="getFolderById",
+     *     tags={"UserFolder"},
+     *     summary="Get Folder by ID",
+     *     description="Returns a Folder by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="folder",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="status", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Folder not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
      */
     public function show($id)
     {
         $user = Auth::user();
 
-        $folder = Folder::where("id", "=", $id)->where("user_id", $user->id)->first();
+        $folder = Folder::where("id", $id)->where("user_id", $user->id)->first();
         if (!$folder) {
-            $data = [
-                "status" => 404,
-                "message" => "Folder not found"
-            ];
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Folder not found"], 404);
         }
 
-        $data = [
-            "status" => 200,
-            "folder" => $folder
-        ];
-
-        return response()->json($data, 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Folder $folder)
-    {
-        //
+        return response()->json(["status" => 200, "folder" => $folder], 200);
     }
 
     /**
      * Update the specified resource in storage.
-     */
-
-    /**
-     * Update the specified resource in storage.
+     *
      * @OA\Put(
      *     path="/api/folder/{id}",
      *     operationId="updateFolder",
      *     tags={"UserFolder"},
-     *     summary="Update Folder ",
-     *     description="Updates a specific Folder ",
+     *     summary="Update Folder",
+     *     description="Updates a specific Folder",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         @OA\Schema(
-     *             type="integer"
-     *         )
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"description", "title", "status"},
-     *             @OA\Property(property="description", type="string"),
+     *             required={"title", "status"},
      *             @OA\Property(property="title", type="string"),
-     *             @OA\Property(property="status", type="string")
+     *             @OA\Property(property="description", type="string", nullable=true),
+     *             @OA\Property(property="status", type="string", enum={"public", "private"})
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Member updated successfully",
-     *         @OA\JsonContent()
+     *         description="Folder updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Folder updated successfully")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Bad request"
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Unauthorized"
+     *         description="Invalid input",
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Group not found"
+     *         description="Folder not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
      *     )
      * )
      */
@@ -326,100 +367,65 @@ class FolderController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'description' => 'nullable|max:255',
-            'status' => 'required',
+            'status' => 'required|in:public,private',
         ]);
 
         if ($validator->fails()) {
-
-            $data = [
-                "status" => 400,
-                "message" => $validator->messages()
-            ];
-
-            return response()->json($data, 400);
-
+            return response()->json(["status" => 400, "message" => $validator->messages()], 400);
         }
 
         $folder = Folder::find($id);
         if (!$folder) {
-            $data = [
-                "status" => 404,
-                "message" => "Folder not found"
-            ];
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Folder not found"], 404);
         }
 
         if ($folder->user_id != $userId) {
-            $data = [
-                "status" => 403,
-                "message" => "Unauthorized"
-            ];
-            return response()->json($data, 403);
-        }
-
-        if ($request->status != "public" && $request->status != "private") {
-            $data = [
-                "status" => 400,
-                "message" => "Invalid input"
-            ];
-
-            return response()->json($data, 400);
+            return response()->json(["status" => 403, "message" => "Unauthorized"], 403);
         }
 
         $folder->title = $request->title;
         $folder->description = $request->description;
         $folder->status = $request->status;
         $folder->save();
-        $data = [
-            "status" => 200,
-            "message" => "Folder updated successfully"
-        ];
-        return response()->json($data, 200);
+
+        return response()->json(["status" => 200, "message" => "Folder updated successfully"], 200);
     }
 
     /**
      * Remove the specified resource from storage.
-     */
-    /**
-     * Remove the specified resource from storage.
+     *
      * @OA\Delete(
      *     path="/api/folder/{id}",
      *     operationId="deleteFolder",
      *     tags={"UserFolder"},
-     *     summary="Delete Folder ",
-     *     description="Deletes a specific Folder ",
+     *     summary="Delete Folder",
+     *     description="Deletes a specific Folder",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         @OA\Schema(
-     *             type="integer"
-     *         )
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             required={"user_id"},
-     *             @OA\Property(property="user_id", type="integer")
-     *         )
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="GroupInvite deleted successfully",
-     *         @OA\JsonContent()
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Bad request"
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Unauthorized"
+     *         description="Folder deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Folder deleted successfully")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Group not found"
+     *         description="Folder not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
      *     )
      * )
      */
@@ -430,29 +436,16 @@ class FolderController extends Controller
 
         $folder = Folder::find($id);
         if (!$folder) {
-            $data = [
-                "status" => 404,
-                "message" => "Folder not found"
-            ];
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Folder not found"], 404);
         }
 
         if ($folder->user_id != $userId) {
-            $data = [
-                "status" => 403,
-                "message" => "Unauthorized"
-            ];
-            return response()->json($data, 403);
+            return response()->json(["status" => 403, "message" => "Unauthorized"], 403);
         }
 
         $folder->delete();
-
         SavedPost::where("user_id", $userId)->where("folder_id", $id)->delete();
 
-        $data = [
-            "status" => 200,
-            "message" => "Folder deleted successfully"
-        ];
-        return response()->json($data, 200);
+        return response()->json(["status" => 200, "message" => "Folder deleted successfully"], 200);
     }
 }

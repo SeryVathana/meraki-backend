@@ -4,14 +4,21 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Group;
-use App\Models\Tag;
+use App\Models\Post;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
+ * @extends Factory<Post>
  */
 class PostFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Post::class;
+
     /**
      * Define the model's default state.
      *
@@ -22,11 +29,11 @@ class PostFactory extends Factory
         return [
             'user_id' => User::factory(),
             'group_id' => Group::factory(),
-            'title' => fake()->title(),
-            'description' => fake()->description(),
-            'img_url' => "https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg",
-            'status' => "public",
-            "is_highlighted" => false,
+            'title' => substr($this->faker->title(), 0, 50),
+            'description' => substr($this->faker->description(), 0, 200),
+            'img_url' => 'https://i.pinimg.com/564x/25/ee/de/25eedef494e9b4ce02b14990c9b5db2d.jpg',
+            'status' => 'public',
+            'is_highlighted' => false,
         ];
     }
 }

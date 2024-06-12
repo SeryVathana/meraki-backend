@@ -11,11 +11,41 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/admin/getTotalUsers",
+     *     operationId="AdmingetTotalUsers",
+     *     tags={"AdminDashboard"},
+     *     summary="Get total users",
+     *     description="Returns the total number of users and the percentage of new users in the last week.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Total users fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_users", type="integer", example=1000),
+     *                 @OA\Property(property="last_week_percent", type="number", format="float", example=10.5)
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getTotalUsers(Request $request)
     {
         $totalUsers = User::count();
-
-        //get last weeks users count
         $lastWeekUsers = User::where('created_at', '>=', now()->subWeek())->count();
         $lastWeekUserPercentage = $lastWeekUsers / $totalUsers * 100;
         $data = [
@@ -30,11 +60,41 @@ class DashboardController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/getTotalPosts",
+     *     operationId="AdmingetTotalPosts",
+     *     tags={"AdminDashboard"},
+     *     summary="Get total posts",
+     *     description="Returns the total number of posts and the percentage of new posts in the last week.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Total posts fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_posts", type="integer", example=1000),
+     *                 @OA\Property(property="last_week_percent", type="number", format="float", example=10.5)
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getTotalPosts(Request $request)
     {
         $totalPosts = Post::count();
-
-        //get last weeks posts count
         $lastWeekPosts = Post::where('created_at', '>=', now()->subWeek())->count();
         $lastWeekPostPercentage = $lastWeekPosts / $totalPosts * 100;
         $data = [
@@ -49,11 +109,41 @@ class DashboardController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/getTotalGroups",
+     *     operationId="AdmingetTotalGroups",
+     *     tags={"AdminDashboard"},
+     *     summary="Get total groups",
+     *     description="Returns the total number of groups and the percentage of new groups in the last week.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Total groups fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="total_groups", type="integer", example=1000),
+     *                 @OA\Property(property="last_week_percent", type="number", format="float", example=10.5)
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getTotalGroups(Request $request)
     {
         $totalGroups = Group::count();
-
-        //get last weeks groups count
         $lastWeekGroups = Group::where('created_at', '>=', now()->subWeek())->count();
         $lastWeekGroupPercentage = $lastWeekGroups / $totalGroups * 100;
         $data = [
@@ -68,26 +158,47 @@ class DashboardController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/getWeeklyNewUsers",
+     *     operationId="AdmingetWeeklyNewUsers",
+     *     tags={"AdminDashboard"},
+     *     summary="Get weekly new users",
+     *     description="Returns the number of new users for the last week and the difference compared to the previous week.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Weekly new users fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="weekly_new_users", type="integer", example=50),
+     *                 @OA\Property(property="difference", type="integer", example=10)
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getWeeklyNewUsers(Request $request)
     {
-        // Calculate the start and end dates for the last week
         $endDateLastWeek = now();
         $startDateLastWeek = now()->subWeek();
-
-        // Calculate the start and end dates for the previous week
         $endDatePreviousWeek = $startDateLastWeek;
         $startDatePreviousWeek = $startDateLastWeek->subWeek();
-
-        // Get the count of new users for the last week
         $newUsersLastWeek = User::whereBetween('created_at', [$startDateLastWeek, $endDateLastWeek])->count();
-
-        // Get the count of new users for the previous week
         $newUsersPreviousWeek = User::whereBetween('created_at', [$startDatePreviousWeek, $endDatePreviousWeek])->count();
-
-        // Calculate the difference
         $difference = $newUsersLastWeek - $newUsersPreviousWeek;
-
-        // Prepare the response data
         $data = [
             "status" => 200,
             "message" => "Weekly new users fetched successfully",
@@ -97,36 +208,98 @@ class DashboardController extends Controller
             ]
         ];
 
-        // Return the JSON response
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/get10NewUsers",
+     *     operationId="Adminget10NewUsers",
+     *     tags={"AdminDashboard"},
+     *     summary="Get 10 newest users",
+     *     description="Returns the 10 newest users.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="10 newest users fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="first_name", type="string", example="John"),
+     *                     @OA\Property(property="last_name", type="string", example="Doe"),
+     *                     @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *                     @OA\Property(property="pf_img_url", type="string", example="http://example.com/profile.jpg")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function get10NewUsers(Request $request)
     {
-        // Get the 10 newest users
         $newUsers = User::select(["id", "first_name", "last_name", "email", "pf_img_url"])->orderBy('created_at', 'desc')->take(10)->get();
-
-        // Prepare the response data
         $data = [
             "status" => 200,
             "message" => "10 newest users fetched successfully",
             "data" => $newUsers
         ];
 
-        // Return the JSON response
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/getTotalPostsOfLastSixMonths",
+     *     operationId="AdmingetTotalPostsOfLastSixMonths",
+     *     tags={"AdminDashboard"},
+     *     summary="Get total posts of the last six months",
+     *     description="Returns the total number of posts for each of the last six months.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Total posts of last six months fetched successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(type="integer", example=100)
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getTotalPostsOfLastSixMonths(Request $request)
     {
-        // Generate the last six months' periods
         $months = collect();
         for ($i = 0; $i < 6; $i++) {
             $months->push(now()->subMonths($i)->startOfMonth()->format('Y-m'));
         }
         $months = $months->reverse();
 
-        // Get the total number of posts for each month in the last six months
         $postCounts = Post::selectRaw('DATE_TRUNC(\'month\', created_at) AS month, COUNT(*) AS count')
             ->where('created_at', '>=', now()->subMonths(6)->startOfMonth())
             ->groupBy('month')
@@ -136,27 +309,70 @@ class DashboardController extends Controller
                 return [\Carbon\Carbon::parse($item->month)->format('Y-m') => $item->count];
             });
 
-        // Prepare the data with 0 for months with no posts
         $data = $months->map(function ($month) use ($postCounts) {
             return $postCounts->get($month, 0);
         })->values()->toArray();
 
-        // Prepare the response data
         $response = [
             "status" => 200,
             "message" => "Total posts of last six months fetched successfully",
             "data" => $data
         ];
 
-        // Return the JSON response
         return response()->json($response, 200);
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/api/admin/users",
+     *     operationId="AdmingetAllUsers",
+     *     tags={"AdminDashboard"},
+     *     summary="Get all users",
+     *     description="Returns a list of all users with their posts, groups owned, and groups joined.",
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Users Retrieved Successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="first_name", type="string", example="John"),
+     *                     @OA\Property(property="last_name", type="string", example="Doe"),
+     *                     @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *                     @OA\Property(property="pf_img_url", type="string", example="http://example.com/profile.jpg"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="posts", type="integer", example=10),
+     *                     @OA\Property(property="group_own", type="integer", example=2),
+     *                     @OA\Property(property="group_member", type="integer", example=5)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getAllUsers(Request $request)
     {
         $searchQuery = $request->query("q");
-        // Check if the authenticated user is an admin
         $loggedUser = Auth::user();
         if ($loggedUser->role !== 'admin') {
             return response()->json([
@@ -165,8 +381,6 @@ class DashboardController extends Controller
             ], 403);
         }
 
-
-        // Build the query to search users
         $usersQuery = User::select(["id", "first_name", "last_name", "email", "pf_img_url", "created_at"])
             ->where("role", "!=", "admin")
             ->orderByDesc("created_at");
@@ -179,9 +393,7 @@ class DashboardController extends Controller
             });
         }
 
-        // Execute the query and get the users
         $users = $usersQuery->get();
-
 
         foreach ($users as $user) {
             $posts = Post::where("user_id", $user->id)->count();
@@ -199,6 +411,51 @@ class DashboardController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/admins",
+     *     operationId="AdmingetAllAdmins",
+     *     tags={"AdminDashboard"},
+     *     summary="Get all admins",
+     *     description="Returns a list of all admins.",
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Admins Retrieved Successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="first_name", type="string", example="John"),
+     *                     @OA\Property(property="last_name", type="string", example="Doe"),
+     *                     @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *                     @OA\Property(property="pf_img_url", type="string", example="http://example.com/profile.jpg"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function getAllAdmins(Request $request)
     {
         $searchQuery = $request->query('q');
@@ -225,7 +482,5 @@ class DashboardController extends Controller
             'data' => $users
         ], 200);
     }
-
 }
-
 

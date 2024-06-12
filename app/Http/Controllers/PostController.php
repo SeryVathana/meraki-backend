@@ -107,19 +107,19 @@ class PostController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *     path="/api/post/highlighted",
-     *     operationId="getHighlightedPosts",
-     *     tags={"UserPost"},
-     *     summary="Get highlighted posts",
-     *     description="Returns the highlighted post",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent()
-     *     )
-     * )
-     */
+ * @OA\Get(
+ *     path="/api/post/allpostslist",
+ *     operationId="getAllPostsList",
+ *     summary="Get all public allpostslist",
+ *     tags={"UserPost"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *          
+ *         ),
+ *     ),
+ * )
+ */
     public function getAllPosts(Request $request)
     {
         $posts = Post::where("status", "public")->orderByDesc("created_at")->get();
@@ -137,17 +137,24 @@ class PostController extends Controller
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
             ];
-
-
-
             array_push($result, $post);
         }
-
-
-
         return response()->json($result, 200);
-
     }
+    /**
+     * @OA\Get(
+     *     path="/api/post/highlighted",
+     *     operationId="getHighlightedPosts",
+     *     tags={"UserPost"},
+     *     summary="Get highlighted posts",
+     *     description="Returns the highlighted post",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function getHighlightedPosts()
     {
         $highlightedPost = Post::where('is_highlighted', true)->first();
@@ -242,7 +249,23 @@ class PostController extends Controller
         return response()->json($data, 200);
     }
 
-
+    /**
+ * @OA\Get(
+ *      path="/api/post/mypost/mobile",
+ *      operationId="getMyPostsMobile",
+ *      tags={"UserPost"},
+ *      summary="Retrieve posts created by the authenticated user",
+ *      description="Returns posts along with user details as JSON.",
+ *      @OA\Response(
+ *          response=200,
+ *          description="Successful operation",
+ *      ),
+ *      @OA\Response(
+ *          response=401,
+ *          description="Unauthenticated",
+ *      )
+ * )
+ */
     public function getMyPostsMobile()
     {
         $user = Auth::user();
@@ -266,11 +289,8 @@ class PostController extends Controller
                 "created_at" => $posts[$i]->created_at,
                 "updated_at" => $posts[$i]->updated_at
             ];
-
             array_push($postDetails, $detail);
         }
-
-
         return response()->json($postDetails, 200);
     }
 
@@ -551,10 +571,6 @@ class PostController extends Controller
         } else {
             $post->status = $request->status;
         }
-
-
-
-
         $post->group_id = $request->group_id;
         $post->user_id = $userId;
         $post->title = $request->title;
@@ -592,6 +608,39 @@ class PostController extends Controller
         $posts = Post::where("title", "like", "%" . $searchQuery . "%")->get();
         return response()->json($posts, 200);
     }
+
+    /**
+ * @OA\Post(
+ *      path="/api/post/createmobilepost",
+ *      operationId="createMobilePost",
+ *      tags={"UserPost"},
+ *      summary="Create a new post",
+ *      description="Creates a new post with the provided details.",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          description="Post details",
+ *          @OA\JsonContent(
+ *              required={"user_id", "title", "description", "img_url"},
+ *              @OA\Property(property="user_id", type="integer"),
+ *              @OA\Property(property="title", type="string"),
+ *              @OA\Property(property="description", type="string"),
+ *              @OA\Property(property="img_url", type="string")
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=201,
+ *          description="Post created successfully",
+ *      ),
+ *      @OA\Response(
+ *          response=401,
+ *          description="Unauthorize",
+ *      ),
+ * *      @OA\Response(
+ *          response=403,
+ *          description="Forbiden",
+ *      )
+ * )
+ */
 
     public function createMobilePost(Request $request)
     {

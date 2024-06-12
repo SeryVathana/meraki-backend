@@ -18,34 +18,75 @@ class GroupMemberController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @OA\Get(
+     *     path="/api/group/notmember/{id}",
+     *     tags={"UserGroupMember"},
+     *     summary="Get users who are not members of the group",
+     *     description="Retrieves users who are not members of the specified group and match the search query.",
+     *     security={{ "bearerAuth":{} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the group",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         description="Search query to filter users",
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(
+     *                 property="users",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="first_name", type="string"),
+     *                     @OA\Property(property="last_name", type="string"),
+     *                     @OA\Property(property="email", type="string"),
+     *                     @OA\Property(property="pf_img_url", type="string"),
+     *                     @OA\Property(property="is_following", type="boolean", description="Indicates if the authenticated user is following this user"),
+     *                     @OA\Property(property="is_invited", type="boolean", description="Indicates if the user is invited to the group"),
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     )
+     * )
      */
-    public function index()
-    {
-        // Implementation here
-    }
-
     public function getNotMembers(Request $request, $id)
     {
         $searchQuery = $request->query("q");
-
         $auth = Auth::user();
-
         $group = Group::find($id);
 
         if (!$group) {
-            $data = [
-                "status" => 404,
-                "message" => "Group not found",
-            ];
-
-            return response()->json($data, 404);
+            return response()->json(['status' => 404, 'message' => 'Group not found'], 404);
         }
 
-        $groupMembers = GroupMember::where("group_id", $id)->get();
+        $groupMembers = GroupMember::where("group_id", $id)->pluck("user_id")->toArray();
 
-        $membersIds = $groupMembers->pluck("user_id")->toArray();
-
-        $users = User::whereNotIn('id', $membersIds)
+        $users = User::whereNotIn('id', $groupMembers)
             ->where(function ($query) use ($searchQuery) {
                 $query->where('first_name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
@@ -53,6 +94,7 @@ class GroupMemberController extends Controller
             })
             ->limit(50)
             ->get();
+
         $result = [];
         foreach ($users as $user) {
             $res = [
@@ -61,47 +103,17 @@ class GroupMemberController extends Controller
                 "last_name" => $user->last_name,
                 "email" => $user->email,
                 "pf_img_url" => $user->pf_img_url,
+                "is_following" => UserFollower::where("user_id", $user->id)->where("follower_id", $auth->id)->exists(),
+                "is_invited" => GroupInvite::where("user_id", $user->id)->where("group_id", $id)->exists(),
             ];
-
-            //check if user is followed by auth user
-            $authFollowing = UserFollower::where("user_id", $user->id)->where("follower_id", $auth->id)->first();
-            if ($authFollowing) {
-                $res["is_following"] = true;
-            }
-
-            $invited = GroupInvite::where("user_id", $user->id)->where("group_id", $id)->first();
-            if (!$invited) {
-                $res["is_invited"] = false;
-            } else {
-                $res["is_invited"] = true;
-            }
 
             array_push($result, $res);
         }
 
-        $data = [
-            'status' => 200,
-            'users' => $result
-        ];
-
-        return response()->json($data, 200);
+        return response()->json(['status' => 200, 'users' => $result], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // Implementation here
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreGroupMemberRequest $request)
-    {
-        // Implementation here
-    }
 
     /**
      * Display the specified resource.
@@ -191,14 +203,6 @@ class GroupMemberController extends Controller
         ];
 
         return response()->json($data, 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(GroupMember $groupMember)
-    {
-        // Implementation here
     }
 
     /**

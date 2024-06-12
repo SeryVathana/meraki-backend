@@ -18,7 +18,7 @@ class TagFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => substr($this->faker->name(), 0, 20),
         ];
     }
 }
