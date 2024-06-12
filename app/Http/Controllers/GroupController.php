@@ -26,7 +26,7 @@ class GroupController extends Controller
     /**
      * @OA\Get(
      *     path="/api/group",
-     *     operationId="getGroupList",
+     *     operationId="UsergetGroupList",
      *     tags={"AdminGroup"},
      *     summary="Get list of Groups",
      *     description="Returns list of Groups",
@@ -52,7 +52,7 @@ class GroupController extends Controller
     {
         $searchQuery = $request->query("q");
 
-        $users = User::where("email", "ilike", "%" . $searchQuery . "%")->get()->pluck("id")->toArray();
+        $users = User::where("email", "ilike", "%" . $searchQuery . "%")->pluck("id")->toArray();
 
         $groups = Group::where("title", "ilike", "%" . $searchQuery . "%")
             ->orWhereIn("owner_id", $users)
@@ -61,15 +61,14 @@ class GroupController extends Controller
 
         foreach ($groups as $group) {
             $membersCount = GroupMember::where('group_id', $group->id)->count();
-            $group["members_count"] = $membersCount;
+            $group->members_count = $membersCount;
 
             $postsCount = Post::where("group_id", $group->id)->count();
-            $group["posts_count"] = $postsCount;
+            $group->posts_count = $postsCount;
 
             $owner = User::find($group->owner_id);
-            $group["owner_email"] = $owner ? $owner->email : "Unknown";
+            $group->owner_email = $owner ? $owner->email : "Unknown";
         }
-
 
         $data = [
             'status' => 200,
@@ -79,6 +78,32 @@ class GroupController extends Controller
         return response()->json($data, 200);
     }
 
+    //User GetGroup
+    /**
+     * @OA\Get(
+     *     path="/api/group/mygroups",
+     *     operationId="UsergetMyGroups",
+     *     tags={"UserGroup"},
+     *     summary="Get my groups",
+     *     description="Returns a list of groups",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     )
+     * )
+     */
     public function getMyGroups(Request $request)
     {
         $user = Auth::user();
@@ -179,6 +204,45 @@ class GroupController extends Controller
         return response()->json($data, 200);
     }
 
+    //User GetUserGroup
+    /**
+     * @OA\Get(
+     *     path="/api/group/user/{id}",
+     *     operationId="UsergetUserGroups",
+     *     tags={"UserGroup"},
+     *     summary="Get groups by user ID",
+     *     description="Returns a list of groups owned by a specific user",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *     )
+     * )
+     */
+
     public function getUserGroups($id)
     {
         $group = Group::where('owner_id', $id)->get();
@@ -196,14 +260,6 @@ class GroupController extends Controller
         ];
 
         return response()->json($data, 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -427,14 +483,6 @@ class GroupController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Group $group)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     /**
@@ -459,7 +507,8 @@ class GroupController extends Controller
      *             type="object",
      *             required={"status", "role"},
      *             @OA\Property(property="status", type="string"),
-     *             @OA\Property(property="title", type="string")
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="img_url", type="string", format="url", nullable=true)
      *         )
      *     ),
      *     @OA\Response(
@@ -541,6 +590,41 @@ class GroupController extends Controller
 
 
     }
+    //Promote User to be Admin
+    /**
+     * @OA\Put(
+     *     path="/api/group/promote/{id}",
+     *     operationId="UserpromoteToAdmin",
+     *     tags={"UserGroup"},
+     *     summary="Promote member to admin",
+     *     description="Promotes a member to admin role",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member promoted to admin successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
 
     public function promoteToAdmin($id)
     {
@@ -573,6 +657,41 @@ class GroupController extends Controller
         ];
         return response()->json($data, 200);
     }
+
+    //User Demote to Admin
+    /**
+     * @OA\Put(
+     *     path="/api/group/demote/{id}",
+     *     operationId="UserdemoteAdmin",
+     *     tags={"UserGroup"},
+     *     summary="Demote admin to member",
+     *     description="Demotes an admin to member role",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Member demoted to user successfully",
+     *       @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Member not found",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function demoteAdmin($id)
     {
         $auth = Auth::user();
@@ -604,93 +723,114 @@ class GroupController extends Controller
         ];
         return response()->json($data, 200);
     }
+/**
+ * Remove the specified resource from storage.
+ *
+ * @OA\Delete(
+ *     path="/api/group/{id}",
+ *     operationId="UserdeleteGroup",
+ *     tags={"UserGroup"},
+ *     summary="Delete group",
+ *     description="Deletes a specific group",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Group deleted successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request"
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Group not found"
+ *     )
+ * )
+ */
+public function destroy($id)
+{
+    $group = Group::find($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-
-    /**
-     * Remove the specified resource from storage.
-     * @OA\Delete(
-     *     path="/api/group/{id}",
-     *     operationId="deleteGroup",
-     *     tags={"UserGroup"},
-     *     summary="Delete group ",
-     *     description="Deletes a specific group ",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(
-     *             type="integer"
-     *         )
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             required={"user_id"},
-     *             @OA\Property(property="user_id", type="integer")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="GroupInvite deleted successfully",
-     *         @OA\JsonContent()
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Bad request"
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Unauthorized"
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Group not found"
-     *     )
-     * )
-     */
-    public function destroy($id)
-    {
-        $group = Group::find($id);
-
-        if (!$group) {
-            $data = [
-                "status" => 404,
-                "message" => "Group with id: $id is not found",
-            ];
-
-            return response()->json($data, 404);
-        }
-
-        if (!Gate::allows('delete', $group)) {
-            $data = [
-                "status" => 403,
-                "message" => "Unauthorized"
-            ];
-
-            return response()->json($data, 403);
-        }
-
-
-        $group->delete();
-
-        GroupMember::where("group_id", "=", $group->id)->delete();
-
-        Post::where("group_id", "=", $group->id)->delete();
-
+    if (!$group) {
         $data = [
-            "status" => 200,
-            "message" => "Group deleted successfully",
+            "status" => 404,
+            "message" => "Group with id: $id is not found",
         ];
 
-        return response()->json($data, 200);
-
+        return response()->json($data, 404);
     }
 
+    if (!Gate::allows('delete', $group)) {
+        $data = [
+            "status" => 403,
+            "message" => "Unauthorized"
+        ];
 
+        return response()->json($data, 403);
+    }
+
+    $group->delete();
+
+    GroupMember::where("group_id", "=", $group->id)->delete();
+
+    Post::where("group_id", "=", $group->id)->delete();
+
+    $data = [
+        "status" => 200,
+        "message" => "Group deleted successfully",
+    ];
+
+    return response()->json($data, 200);
+}
+
+    /**
+ * @OA\Put(
+ *     path="/api/group/public/join/{id}",
+ *     operationId="UserjoinPublicGroup",
+ *     tags={"UserGroup"},
+ *     summary="Join a public group",
+ *     description="Allows a user to join a public group",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="You have joined the group successfully",
+ *          @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Group not found",
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="You are already a member of this group",
+ *     )
+ * )
+ */
     public function joinPublicGroup($id)
     {
         $user = Auth::user();
@@ -734,6 +874,40 @@ class GroupController extends Controller
         return response()->json($data, 200);
     }
 
+
+    /**
+ * @OA\Put(
+ *     path="/api/group/leave/{id}",
+ *     operationId="UserleaveGroup",
+ *     tags={"UserGroup"},
+ *     summary="Leave a group",
+ *     description="Allows a user to leave a group",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="You have left the group successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Group not found",
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="You are not a member of this group",
+ *     )
+ * )
+ */
     public function leaveGroup($id)
     {
         $user = Auth::user();

@@ -19,7 +19,7 @@ class GroupFactory extends Factory
     {
         return [
             'owner_id' => User::factory(),
-            'title' => $this->faker->name(),
+            'title' => substr($this->faker->name(), 0, 100),
             'status' => "public",
         ];
     }

@@ -10,6 +10,21 @@ use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
+     /**
+     * @OA\Get(
+     *     path="/api/post/advancesearch",
+     *     summary="Perform advanced search",
+     *     tags={"UserSearch"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="string",
+     *             example="hi"
+     *         )
+     *     )
+     * )
+     */
     public function advancedsearch(Request $request)
     {
         print_r("hi");
@@ -35,6 +50,31 @@ class SearchController extends Controller
         return response()->json("hi", 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/search/user",
+     *     summary="SearchUsers",
+     *     tags={"UserSearch"},
+     *     operationId="SearchUsers",
+     *     description="Insert to SearchUsers",
+     *     @OA\Parameter(
+     *         name="term",
+     *         in="query",
+     *         required=false,
+     *         description="Search term",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="users", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
     public function searchUsers(Request $request)
     {
         $term = $request->query('term');
@@ -58,6 +98,31 @@ class SearchController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/search/group",
+     *     summary="SearchGroups",
+     *     tags={"UserSearch"},
+     *     operationId="SearchGroups",
+     *     description="Insert the SearchGroups",
+     *     @OA\Parameter(
+     *         name="term",
+     *         in="query",
+     *         required=false,
+     *         description="Search term",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="groups", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
     public function searchGroups(Request $request)
     {
         $term = $request->query('term');
@@ -84,6 +149,32 @@ class SearchController extends Controller
         return response()->json($data, 200);
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/api/search/post",
+     *     summary="SearchPosts",
+     *     tags={"UserSearch"},
+     *     operationId="SearchPost",
+     *     description="Insert to SearchPost",
+     *     @OA\Parameter(
+     *         name="term",
+     *         in="query",
+     *         required=false,
+     *         description="Search term",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="posts", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
     public function searchPosts(Request $request)
     {
         $term = $request->query('term');
@@ -103,6 +194,8 @@ class SearchController extends Controller
 
         return response()->json($data, 200);
     }
+
+
 
     public function getRandomUsers()
     {
@@ -133,6 +226,8 @@ class SearchController extends Controller
         return response()->json($data, 200);
     }
 
+
+    
     public function getRandomPosts()
     {
         $posts = DB::table('posts')

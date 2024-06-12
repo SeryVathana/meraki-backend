@@ -82,52 +82,80 @@ class GroupInviteController extends Controller
 
         return response()->json($data, 200);
     }
-
-
-    public function getPendingInvites()
-    {
-        $auth = Auth::user();
-        if (!$auth) {
-            $data = [
-                "status" => 401,
-                "message" => "Unauthorized"
-            ];
-
-            return response()->json($data, 401);
-        }
-
-        $invites = GroupInvite::where("user_id", $auth->id)->get();
-
-        $result = [];
-
-        foreach ($invites as $invite) {
-            $group = Group::find($invite->group_id);
-            $res = [
-                "id" => $invite->id,
-                "group_id" => $group->id,
-                "title" => $group->title,
-                "img_url" => $group->img_url,
-                "status" => $group->status,
-                "created_at" => $invite->created_at,
-            ];
-
-            array_push($result, $res);
-        }
-
-        $data = [
-            "status" => 200,
-            "invites" => $result
-        ];
-        return response()->json($data, 200);
-    }
-
+     //User GetPedingInvites
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+ * @OA\Get(
+ *     path="/api/group/pending/invite",
+ *     tags={"UserGroupInvite"},
+ *     summary="Get Pending Group Invites",
+ *     description="Returns a list of pending group invites for the authenticated user.",
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Success",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(
+ *                 property="invites",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="group_id", type="integer"),
+ *                     @OA\Property(property="title", type="string"),
+ *                     @OA\Property(property="img_url", type="string"),
+ *                     @OA\Property(property="status", type="string", example="active"),
+ *                     @OA\Property(property="created_at", type="string", format="date-time"),
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *     )
+ * )
+ */
+public function getPendingInvites()
+{
+    $auth = Auth::user();
+    if (!$auth) {
+        $data = [
+            "status" => 401,
+            "message" => "Unauthorized"
+        ];
+
+        return response()->json($data, 401);
     }
+
+    $invites = GroupInvite::where("user_id", $auth->id)->get();
+
+    $result = [];
+
+    foreach ($invites as $invite) {
+        $group = Group::find($invite->group_id);
+        $res = [
+            "id" => $invite->id,
+            "group_id" => $group->id,
+            "title" => $group->title,
+            "img_url" => $group->img_url,
+            "status" => $group->status,
+            "created_at" => $invite->created_at,
+        ];
+
+        array_push($result, $res);
+    }
+
+    $data = [
+        "status" => 200,
+        "invites" => $result
+    ];
+    return response()->json($data, 200);
+}
 
     /**
      * Store a newly created resource in storage.
@@ -257,22 +285,6 @@ class GroupInviteController extends Controller
 
         return response()->json($data, 200);
 
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(GroupInvite $groupInvite)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(GroupInvite $groupInvite)
-    {
-        //
     }
 
     /**

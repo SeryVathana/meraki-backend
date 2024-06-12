@@ -19,8 +19,8 @@ class FolderFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'title' => fake()->title(),
-            'description' => fake()->description(),
+            'title' => substr($this->faker()->title(), 0, 50),
+            'description' => substr($this->faker()->description(), 0, 200),
             'status' => "public",
         ];
     }

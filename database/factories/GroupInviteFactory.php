@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Group;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,15 @@ class GroupInviteFactory extends Factory
         return [
             'user_id' => User::factory(),
             'group_id' => Group::factory(),
+            'accepted_at' => null,
         ];
+    }
+    public function accepted(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'accepted_at' => Carbon::now(),
+            ];
+        });
     }
 }

@@ -15,22 +15,8 @@ use Illuminate\Http\JsonResponse;
 class GroupRequestController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
+     * Create Group Request.
+     *
      * @OA\Post(
      *     path="/api/group/request/{id}",
      *     operationId="storeGroupRequest",
@@ -78,78 +64,73 @@ class GroupRequestController extends Controller
 
         $existedMember = GroupMember::where("group_id", $id)->where("user_id", $userId)->first();
         if ($existedMember) {
-            $data = [
-                "status" => 400,
-                "message" => "User already in group",
-            ];
-
-            return response()->json($data, 400);
+            return response()->json(["status" => 400, "message" => "User already in group"], 400);
         }
 
         $existedReq = GroupRequest::where("group_id", $id)->where("user_id", $userId)->first();
         if ($existedReq) {
-
-            //delete request
-
             $existedReq->delete();
-
-            $data = [
-                "status" => 200,
-                "message" => "Request deleted successfully",
-            ];
-
-            return response()->json($data, 200);
+            return response()->json(["status" => 200, "message" => "Request deleted successfully"], 200);
         }
 
         $group = Group::find($id);
         if (!$group) {
-            $data = [
-                "status" => 404,
-                "message" => "Group not found",
-            ];
-
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Group not found"], 404);
         }
 
         $groupReq = new GroupRequest;
-
         $groupReq->user_id = $userId;
         $groupReq->group_id = $group->id;
-
         $groupReq->save();
 
-        $data = [
-            "status" => 201,
-            "message" => "Request created successfully"
-        ];
-
-        return response()->json($data, 201);
+        return response()->json(["status" => 201, "message" => "Request created successfully"], 201);
     }
 
+    /**
+     * Retrieve pending requests for a group.
+     *
+     * @OA\Get(
+     *      path="/api/group/request/pending/{id}",
+     *      operationId="getPendingRequests",
+     *      tags={"UserGroupRequest"},
+     *      summary="Retrieve pending requests for a group",
+     *      description="Retrieves pending requests for a group identified by its ID.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      )
+     * )
+     */
     public function getPendingRequests($id)
     {
         $group = Group::find($id);
         if (!$group) {
-            $data = [
-                "status" => 404,
-                "message" => "Group not found"
-            ];
-
-            return response()->json($data, 404);
+            return response()->json(["status" => 404, "message" => "Group not found"], 404);
         }
 
         if (!Gate::allows('accept_request', $group)) {
-            $data = [
-                "status" => 403,
-                "message" => "Unauthorized"
-            ];
-
-            return response()->json($data, 403);
+            return response()->json(["status" => 403, "message" => "Unauthorized"], 403);
         }
 
         $requests = GroupRequest::where("group_id", $id)->get();
 
-        //get user info
         foreach ($requests as $req) {
             $user = User::find($req->user_id);
             $req->user_id = $user->id;
@@ -159,36 +140,16 @@ class GroupRequestController extends Controller
             $req->pf_img_url = $user->pf_img_url;
         }
 
-        $data = [
-            "status" => 200,
-            "message" => "Requests",
-            "data" => $requests
-        ];
-
-        return response()->json($data, 200);
+        return response()->json(["status" => 200, "message" => "Requests", "data" => $requests], 200);
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(GroupRequest $groupRequest)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(GroupRequest $groupRequest)
-    {
-        //
-    }
-
-    /**
+     * Update Group Request.
+     *
      * @OA\Put(
      *     path="/api/group/request/accept/{id}",
      *     operationId="updateGroupRequest",
-     *     tags={"GroupRequest"},
+     *     tags={"UserGroupRequest"},
      *     summary="Update Group Request",
      *     description="Updates a specific Group Request",
      *     @OA\Parameter(
@@ -205,7 +166,7 @@ class GroupRequestController extends Controller
      *             type="object",
      *             required={"group_id","user_id", "role"},
      *             @OA\Property(property="group_id", type="integer"),
-     * *           @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
      *             @OA\Property(property="role", type="string")
      *         )
      *     ),

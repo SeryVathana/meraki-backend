@@ -123,6 +123,44 @@ class UserController extends Controller
         }
     }
 
+
+
+    /**
+ * Create admin.
+ *
+ * @OA\Post(
+ *     path="/api/admin/createAdmin",
+ *     summary="Create admin",
+ *     tags={"AdminUser"},
+ *     description="Create a new admin user.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"first_name", "last_name", "email"},
+ *             @OA\Property(property="first_name", type="string"),
+ *             @OA\Property(property="last_name", type="string"),
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="pf_img_url", type="string"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Admin created successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Admin already exists",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error",
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error",
+ *     )
+ * )
+ */
     public function createAdmin(Request $request)
     {
         try {
@@ -236,6 +274,65 @@ class UserController extends Controller
         // Shuffle the password to ensure random order
         return str_shuffle($password); // Use PHP's built-in str_shuffle function
     }
+
+
+    /**
+ * Create a new user via mobile.
+ *
+ * @OA\Post(
+ *     path="/api/auth/createusermobile",
+ *     summary="Create a new user via mobile",
+ *     tags={"CreateUserMobile"},
+ *     description="Creates a new user with email and password.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *             @OA\Property(property="password", type="string", example="password123"),
+ *             @OA\Property(property="pf_img_url", type="string", example="https://example.com/image.jpg"),
+ *             @OA\Property(property="social_login_info", type="string", example="{}")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User Created Successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer", example=200),
+ *             @OA\Property(property="message", type="string", example="User Created Successfully"),
+ *             @OA\Property(property="token", type="string", example="someTokenValue")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer", example=401),
+ *             @OA\Property(property="message", type="string", example="validation error"),
+ *             @OA\Property(property="errors", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Email already taken",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer", example=400),
+ *             @OA\Property(property="message", type="string", example="Email already taken")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer", example=500),
+ *             @OA\Property(property="message", type="string", example="Internal Server Error")
+ *         )
+ *     )
+ * )
+ */
     public function createUserMobile(Request $request)
     {
         try {
@@ -388,48 +485,42 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+
     /**
-     * Get All Users
-     * @OA\Get(
-     *     path="/api/auth/users",
-     *     operationId="getAllUsers",
-     *     tags={"User"},
-     *     summary="Get All Users",
-     *     description="Retrieve all users. Only accessible to admin users.",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Users Retrieved Successfully",
-     *         @OA\JsonContent(type="array", @OA\Items())
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Forbidden",
-     *         @OA\JsonContent()
-     *     )
-     * )
-     */
-    public function getAllUsers(Request $request)
-    {
-        // Check if the authenticated user is an admin
-        $user = Auth::user();
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'status' => 403,
-                'message' => 'Forbidden: You do not have permission to access this resource.'
-            ], 403);
-        }
-
-
-        // Get all users
-        $users = User::all();
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'Users Retrieved Successfully',
-            'data' => $users
-        ], 200);
-    }
-
+ * Get user data.
+ *
+ * @OA\Get(
+ *     path="/api/user",
+ *     summary="Get user data",
+ *     tags={"UserUser"},
+ *     description="Get user data.",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer"),
+ *                 @OA\Property(property="first_name", type="string"),
+ *                 @OA\Property(property="last_name", type="string"),
+ *                 @OA\Property(property="email", type="string"),
+ *                 @OA\Property(property="role", type="string"),
+ *                 @OA\Property(property="pf_img_url", type="string"),
+ *                 @OA\Property(property="followers", type="integer"),
+ *                 @OA\Property(property="followings", type="integer"),
+ *                 @OA\Property(property="created_at", type="string", format="date-time"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+ *                 @OA\Property(property="invites", type="integer"),
+ *                 @OA\Property(property="group_req", type="integer"),
+ *                 @OA\Property(property="total_noti", type="integer"),
+ *             )
+ *         )
+ *     )
+ * )
+ */
     public function getUserData(Request $request)
     {
         $user = Auth::user();
@@ -470,6 +561,29 @@ class UserController extends Controller
             'data' => $data
         ], 200);
     }
+
+    /**
+ * Get user data for mobile.
+ *
+ * @OA\Get(
+ *     path="/api/user/mobile",
+ *     summary="Get user data for mobile",
+ *     tags={"UserUser"},
+ *     description="Get user data for mobile.",
+ *     @OA\Response(
+ *         response=200,
+ *         description="User data retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer"),
+ *             @OA\Property(property="name", type="string"),
+ *             @OA\Property(property="email", type="string"),
+ *             @OA\Property(property="created_at", type="string", format="date-time"),
+ *             @OA\Property(property="updated_at", type="string", format="date-time"),
+ *         )
+ *     )
+ * )
+ */
     public function getUserDataMobile(Request $request)
     {
         $user = Auth::user();
@@ -477,6 +591,53 @@ class UserController extends Controller
         return response()->json($user, 200);
     }
 
+
+    /**
+ * Get user data by ID.
+ *
+ * @OA\Get(
+ *     path="/api/user/{id}",
+ *     summary="Get user data by ID",
+ *     tags={"UserUser"},
+ *     description="Get user data by ID.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the user",
+ *         @OA\Schema(
+ *             type="integer",
+ *             format="int64"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="user",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer"),
+ *                 @OA\Property(property="first_name", type="string"),
+ *                 @OA\Property(property="last_name", type="string"),
+ *                 @OA\Property(property="is_following", type="boolean"),
+ *                 @OA\Property(property="email", type="string"),
+ *                 @OA\Property(property="role", type="string"),
+ *                 @OA\Property(property="pf_img_url", type="string"),
+ *                 @OA\Property(property="followers", type="integer"),
+ *                 @OA\Property(property="followings", type="integer"),
+ *                 @OA\Property(property="created_at", type="string", format="date-time"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *     )
+ * )
+ */
     public function getUserDataById(Request $request, $id)
     {
 
@@ -521,6 +682,33 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    /**
+ * Edit user profile.
+ *
+ * @OA\Put(
+ *     path="/api/user/editMobile",
+ *     summary="Edit user editMobile",
+ *     tags={"UserUser"},
+ *     description="Edit user editMobile.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="User editMobile data",
+ *         @OA\JsonContent(
+ *             required={"username"},
+ *             @OA\Property(property="username", type="string"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile updated successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error or no changes made",
+ *     ),
+ * )
+ */
     public function editProfileMobile(Request $request)
     {
         //only username
@@ -568,6 +756,34 @@ class UserController extends Controller
             'data' => $user
         ], 200);
     }
+
+    /**
+ * Edit user profile.
+ *
+ * @OA\Put(
+ *     path="/api/user/edit",
+ *     summary="Edit user profile",
+ *     tags={"UserUser"},
+ *     description="Edit user profile.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="User profile data",
+ *         @OA\JsonContent(
+ *             required={"first_name", "last_name"},
+ *             @OA\Property(property="first_name", type="string"),
+ *             @OA\Property(property="last_name", type="string"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile updated successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error or no changes made",
+ *     ),
+ * )
+ */
     public function editProfile(Request $request)
     {
         //only username
@@ -621,6 +837,27 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    /**
+ * Logout user.
+ *
+ * @OA\Put(
+ *     path="/api/auth/logout",
+ *     summary="Logout user",
+ *     tags={"UserUser"},
+ *     description="Logout user.",
+ *     @OA\Response(
+ *         response=200,
+ *         description="User logged out successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     )
+ * )
+ */
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -639,6 +876,25 @@ class UserController extends Controller
         ], 200);
     }
 
+    /**
+ * Logout user from all devices.
+ *
+ * @OA\Get(
+ *     path="/api/auth/logoutAll",
+ *     summary="Logout user from all devices",
+ *     tags={"UserUser"},
+ *     description="Logout user from all devices.",
+ *     @OA\Response(
+ *         response=200,
+ *         description="User logged out from all devices successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     )
+ * )
+ */
     public function logoutAll(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -647,8 +903,8 @@ class UserController extends Controller
             'message' => 'User Logged Out From All Devices Successfully'
         ], 200);
     }
-
-    public function checkUserPassword(Request $request)
+  
+      public function checkUserPassword(Request $request)
     {
         $loggedUser = Auth::user();
 
@@ -679,6 +935,35 @@ class UserController extends Controller
             'message' => 'Password Matched',
         ], 200);
     }
+
+
+    /**
+ * Update user password.
+ *
+ * @OA\Put(
+ *     path="/api/admin/user/password",
+ *     summary="Update user password",
+ *     tags={"UserUser"},
+ *     description="Update user password.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="User password data",
+ *         @OA\JsonContent(
+ *             required={"old_password", "new_password"},
+ *             @OA\Property(property="old_password", type="string"),
+ *             @OA\Property(property="new_password", type="string"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Password updated successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error or incorrect old password or new password same as old password",
+ *     )
+ * )
+ */
 
     public function updateUserPassword(Request $request)
     {
@@ -723,6 +1008,7 @@ class UserController extends Controller
             ], 401);
         }
 
+        if ($loggedUser instanceof User){
         $loggedUser->password = Hash::make($request->new_password);
         $loggedUser->save();
 
@@ -730,28 +1016,67 @@ class UserController extends Controller
             'status' => 200,
             'message' => 'Password Updated Successfully',
         ], 200);
+        }else {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Internal Server Error: User object not found or invalid',
+            ], 500);
+        }
     }
 
+    /**
+ * Update user profile image.
+ *
+ * @OA\Put(
+ *     path="/api/user/updatepf",
+ *     summary="Update user profile image",
+ *     tags={"UserUser"},
+ *     description="Update user profile image.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="User profile image data",
+ *         @OA\JsonContent(
+ *             required={"pf_img_url"},
+ *             @OA\Property(property="pf_img_url", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile image updated successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Validation error",
+ *     )
+ * )
+ */
+public function updateUserPfImg(Request $request)
+{
+    $loggedUser = Auth::user();
 
-    public function updateUserPfImg(Request $request)
-    {
-        $loggedUser = Auth::user();
+    if (!$loggedUser) {
+        return response()->json([
+            'status' => 401,
+            'message' => 'User not authenticated',
+        ], 401);
+    }
 
-        $validateUser = Validator::make(
-            $request->all(),
-            [
-                'pf_img_url' => 'required',
-            ]
-        );
+    $validateUser = Validator::make(
+        $request->all(),
+        [
+            'pf_img_url' => 'required',
+        ]
+    );
 
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
+    if ($validateUser->fails()) {
+        return response()->json([
+            'status' => 401,
+            'message' => 'Validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
 
+    if ($loggedUser instanceof User) {
         $loggedUser->pf_img_url = $request->pf_img_url;
         $loggedUser->save();
 
@@ -759,8 +1084,54 @@ class UserController extends Controller
             'status' => 200,
             'message' => 'Profile Image Updated Successfully',
         ], 200);
+    } else {
+        return response()->json([
+            'status' => 500,
+            'message' => 'Internal Server Error: User object not found or invalid',
+        ], 500);
     }
+}
 
+
+    /**
+ * Update user information by admin.
+ *
+ * @OA\Put(
+ *     path="/api/admin/user/{id}",
+ *     summary="Update user information by admin",
+ *     tags={"AdminUser"},
+ *     description="Update user information by admin using user ID.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID of the user",
+ *         required=true,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="User data to update",
+ *         @OA\JsonContent(
+ *             required={"first_name", "last_name", "pf_img_url"},
+ *             @OA\Property(property="first_name", type="string"),
+ *             @OA\Property(property="last_name", type="string"),
+ *             @OA\Property(property="pf_img_url", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User updated successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden: You do not have permission to access this resource."
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found"
+ *     )
+ * )
+ */
     public function adminUpdateUserInfo(Request $request, $id)
     {
         $loggedUser = Auth::user();
@@ -801,6 +1172,41 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    /**
+ * Remove admin role from a user.
+ *
+ * @OA\Put(
+ *     path="/api/admin/remove{id}",
+ *     summary="Remove admin role from a user",
+ *     tags={"AdminUser"},
+ *     description="Remove admin role from a user by ID.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID of the user",
+ *         required=true,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Admin role removed successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="integer"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found"
+ *     )
+ * )
+ */
     public function removeAdmin(Request $request, $id)
     {
         $loggedUser = Auth::user();
@@ -829,6 +1235,37 @@ class UserController extends Controller
             'message' => 'Admin Removed Successfully',
         ], 200);
     }
+
+
+    /**
+ * Delete a user.
+ *
+ * @OA\Delete(
+ *     path="/api/admin/deleteUser/{id}",
+ *     summary="Delete a user",
+ *     tags={"AdminUser"},
+ *     description="Delete a user by ID.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID of the user to delete",
+ *         required=true,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User deleted successfully",
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found"
+ *     )
+ * )
+ */
 
     public function deleteUser(Request $request, $id)
     {

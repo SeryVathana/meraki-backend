@@ -252,19 +252,52 @@ class CommentController extends Controller
         return response()->json($data, 200);
     }
 
+    //User Destroy Comment
     /**
-     * Display the specified resource.
+     * Remove the specified resource from storage.
      */
-    public function show(Comment $comment)
-    {
-        //
-    }
-    public function update(UpdateCommentRequest $request, Comment $comment)
-    {
-        //
-    }
-
-    public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/comment/{id}",
+     *     operationId="UserdeleteComment",
+     *     tags={"UserComment"},
+     *     summary="Delete Comment ",
+     *     description="Deletes a specific Comment ",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="GroupInvite deleted successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
+    public function destroy(User $id)
     {
         $loggedInUser = Auth::user();
 
@@ -329,7 +362,7 @@ class CommentController extends Controller
      * @OA\Get(
      *     path="/api/admin/comment/{id}",
      *     operationId="AdmingetCommnetById",
-     *     tags={"AdminCommnet"},
+     *     tags={"AdminComment"},
      *     summary="Get Commnet information",
      *     description="Returns Commnet data",
      *     @OA\Parameter(

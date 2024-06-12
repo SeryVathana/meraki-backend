@@ -22,8 +22,20 @@ class CommentFactory extends Factory
         return [
             'user_id' => User::factory(),
             'post_id' => Post::factory(),
-            'comment' => $this->faker()->description(),
-            'reply_cmt_id' => Comment::factory()
+            'comment' => substr($this->faker->comment(), 0, 200),
+            'reply_cmt_id' => Comment::factory(), 
         ];
+    }
+
+    /**
+     * Indicate that the comment is a reply to another comment.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function reply(Comment $replyToComment): Factory
+    {
+        return $this->state([
+            'reply_cmt_id' => $replyToComment->id,
+        ]);
     }
 }

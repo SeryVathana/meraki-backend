@@ -9,6 +9,41 @@ use Illuminate\Support\Facades\Auth;
 
 class UserFollowerController extends Controller
 {
+    /**
+     * Follow a user.
+     *
+     * @OA\Put(
+     *     path="/api/user/follow/{id}",
+     *     operationId="followUser",
+     *     tags={"UserFollower"},
+     *     summary="Follow a user",
+     *     description="Follow a user by ID.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the user to follow",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User followed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *     ),
+     * )
+     */
     public function followUser($id)
     {
         $loggedInUser = Auth::user();
@@ -19,8 +54,6 @@ class UserFollowerController extends Controller
                 'message' => 'You can not follow yourself'
             ], 401);
         }
-
-
         $user = User::find($id);
         $follower = UserFollower::where('user_id', $user->id)->where('follower_id', $loggedInUser->id)->first();
 
@@ -43,6 +76,42 @@ class UserFollowerController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Unfollow a user.
+     *
+     * @OA\Put(
+     *     path="/api/user/unfollow/{id}",
+     *     operationId="unfollowUser",
+     *     tags={"UserFollower"},
+     *     summary="Unfollow a user",
+     *     description="Unfollow a user by ID.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the user to unfollow",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User unfollowed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *     ),
+     * )
+     */
     public function unfollowUser($id)
     {
         $loggedInUser = Auth::user();
@@ -70,6 +139,70 @@ class UserFollowerController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Get user followers.
+     *
+     * @OA\Get(
+     *     path="/api/user/follower/{id}",
+     *     summary="Get user followers",
+     *     tags={"UserFollower"},
+     *     description="Get user followers by ID.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         required=false,
+     *         description="Search query",
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="integer",
+     *                 example=200
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User followers"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="first_name", type="string"),
+     *                     @OA\Property(property="last_name", type="string"),
+     *                     @OA\Property(property="email", type="string"),
+     *                     @OA\Property(property="pf_img_url", type="string"),
+     *                     @OA\Property(property="is_following", type="boolean"),
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *     )
+     * )
+     */
+    
     public function getUserFollowers(Request $request, $id)
     {
         $searchQuery = $request->query('q');
@@ -127,6 +260,67 @@ class UserFollowerController extends Controller
     }
 
 
+        /**
+ * @OA\Get(
+ *     path="/api/user/following/{id}",
+ *     summary="Get user following",
+ *     tags={"UserFollower"},
+ *     summary="getUserFollowing",
+ *     description="getUserFollowing by ID.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the user",
+ *         @OA\Schema(
+ *             type="integer",
+ *             format="int64"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="q",
+ *         in="query",
+ *         required=false,
+ *         description="Search query",
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="status",
+ *                 type="integer",
+ *                 example=200
+ *             ),
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="User Followers"
+ *             ),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="first_name", type="string"),
+ *                     @OA\Property(property="last_name", type="string"),
+ *                     @OA\Property(property="email", type="string"),
+ *                     @OA\Property(property="pf_img_url", type="string"),
+ *                     @OA\Property(property="is_following", type="boolean"),
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *     )
+ * )
+ */
     public function getUserFollowings(Request $request, $id)
     {
         $searchQuery = $request->query('q');
