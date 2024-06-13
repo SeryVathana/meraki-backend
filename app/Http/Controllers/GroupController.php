@@ -678,9 +678,9 @@ class GroupController extends Controller
      *         response=200,
      *         description="Member demoted to user successfully",
      *       @OA\JsonContent(
- *             @OA\Property(property="status", type="integer"),
- *             @OA\Property(property="message", type="string")
- *         )
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -723,114 +723,143 @@ class GroupController extends Controller
         ];
         return response()->json($data, 200);
     }
-/**
- * Remove the specified resource from storage.
- *
- * @OA\Delete(
- *     path="/api/group/{id}",
- *     operationId="UserdeleteGroup",
- *     tags={"UserGroup"},
- *     summary="Delete group",
- *     description="Deletes a specific group",
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(
- *             type="integer"
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Group deleted successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="integer"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="Bad request"
- *     ),
- *     @OA\Response(
- *         response=403,
- *         description="Unauthorized"
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Group not found"
- *     )
- * )
- */
-public function destroy($id)
-{
-    $group = Group::find($id);
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @OA\Delete(
+     *     path="/api/group/{id}",
+     *     operationId="UserdeleteGroup",
+     *     tags={"UserGroup"},
+     *     summary="Delete group",
+     *     description="Deletes a specific group",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Group deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found"
+     *     )
+     * )
+     */
+    public function destroy(Request $request, $id)
+    {
 
-    if (!$group) {
+        // validate password
+
+        $user = Auth::user();
+
+        $validator = Validator::make(request()->all(), [
+            'password' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $data = [
+                "status" => 400,
+                "message" => $validator->messages()
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        //check password
+        if (!Hash::check(request()->password, $user->password)) {
+            $data = [
+                "status" => 401,
+                "message" => "Password is incorrect"
+            ];
+
+            return response()->json($data, 401);
+        }
+
+
+        $group = Group::find($id);
+
+        if (!$group) {
+            $data = [
+                "status" => 404,
+                "message" => "Group with id: $id is not found",
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        if (!Gate::allows('delete', $group)) {
+            $data = [
+                "status" => 403,
+                "message" => "Unauthorized"
+            ];
+
+            return response()->json($data, 403);
+        }
+
+        $group->delete();
+
+        GroupMember::where("group_id", "=", $group->id)->delete();
+
+        Post::where("group_id", "=", $group->id)->delete();
+
         $data = [
-            "status" => 404,
-            "message" => "Group with id: $id is not found",
+            "status" => 200,
+            "message" => "Group deleted successfully",
         ];
 
-        return response()->json($data, 404);
+        return response()->json($data, 200);
     }
-
-    if (!Gate::allows('delete', $group)) {
-        $data = [
-            "status" => 403,
-            "message" => "Unauthorized"
-        ];
-
-        return response()->json($data, 403);
-    }
-
-    $group->delete();
-
-    GroupMember::where("group_id", "=", $group->id)->delete();
-
-    Post::where("group_id", "=", $group->id)->delete();
-
-    $data = [
-        "status" => 200,
-        "message" => "Group deleted successfully",
-    ];
-
-    return response()->json($data, 200);
-}
 
     /**
- * @OA\Put(
- *     path="/api/group/public/join/{id}",
- *     operationId="UserjoinPublicGroup",
- *     tags={"UserGroup"},
- *     summary="Join a public group",
- *     description="Allows a user to join a public group",
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(
- *             type="integer"
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="You have joined the group successfully",
- *          @OA\JsonContent(
- *             @OA\Property(property="status", type="integer"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Group not found",
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="You are already a member of this group",
- *     )
- * )
- */
+     * @OA\Put(
+     *     path="/api/group/public/join/{id}",
+     *     operationId="UserjoinPublicGroup",
+     *     tags={"UserGroup"},
+     *     summary="Join a public group",
+     *     description="Allows a user to join a public group",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="You have joined the group successfully",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="You are already a member of this group",
+     *     )
+     * )
+     */
     public function joinPublicGroup($id)
     {
         $user = Auth::user();
@@ -876,38 +905,38 @@ public function destroy($id)
 
 
     /**
- * @OA\Put(
- *     path="/api/group/leave/{id}",
- *     operationId="UserleaveGroup",
- *     tags={"UserGroup"},
- *     summary="Leave a group",
- *     description="Allows a user to leave a group",
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(
- *             type="integer"
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="You have left the group successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="integer"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Group not found",
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="You are not a member of this group",
- *     )
- * )
- */
+     * @OA\Put(
+     *     path="/api/group/leave/{id}",
+     *     operationId="UserleaveGroup",
+     *     tags={"UserGroup"},
+     *     summary="Leave a group",
+     *     description="Allows a user to leave a group",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="You have left the group successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Group not found",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="You are not a member of this group",
+     *     )
+     * )
+     */
     public function leaveGroup($id)
     {
         $user = Auth::user();
