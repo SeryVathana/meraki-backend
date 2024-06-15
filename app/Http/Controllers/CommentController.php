@@ -297,7 +297,7 @@ class CommentController extends Controller
      *     )
      * )
      */
-    public function destroy(User $id)
+    public function destroy($id)
     {
         $loggedInUser = Auth::user();
 
